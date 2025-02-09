@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "227040916026",
+    "project_id": "uni-student-tracker",
+    "storage_bucket": "uni-student-tracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227040916026:android:734fcddc3771dd89363b03",
+        "android_client_info": {
+          "package_name": "com.example.nsbm_student_academic_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt-luUKGTaX9xoYXS2-pJEVOLYbrvcUxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
