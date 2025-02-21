@@ -40,7 +40,6 @@ class _ComponentTestState extends State<ComponentTest>{
                       fontStyle: FontStyle.italic,
                   ),
                 ),
-
             )
           ],
         ),
