@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nsbm_student_academic_tracker/firebase_options.dart';
 import 'package:nsbm_student_academic_tracker/pages/componenttest.dart';
 import 'package:nsbm_student_academic_tracker/pages/helloworld.dart';
+import 'package:nsbm_student_academic_tracker/pages/homescreen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner:false,
       title: 'NSBM Student Academic Tracker',
-      home: const ComponentTest(),
+      home: const HomeScreen(),
     );
   }
 }
