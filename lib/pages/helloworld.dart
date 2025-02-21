@@ -8,6 +8,10 @@ class WelcomeToProject extends StatefulWidget{
 
 }
 
+void isFirebaseConnected(){
+
+}
+
 class _WelcomeToProjectState extends State<WelcomeToProject>{
   @override
   Widget build(BuildContext context) {
