@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "227040916026",
+    "project_id": "uni-student-tracker",
+    "storage_bucket": "uni-student-tracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:227040916026:android:734fcddc3771dd89363b03",
+        "android_client_info": {
+          "package_name": "com.example.nsbm_student_academic_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "227040916026-l41vfug1vl7gsql5vrthtpke92nsqu6g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nsbm_student_academic_tracker",
+            "certificate_hash": "b6cab8f1d664a4795e0128b85756122316dba9a9"
+          }
+        },
+        {
+          "client_id": "227040916026-rjsun0ves4a89si1g6g9r5b5gkiv8qbt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt-luUKGTaX9xoYXS2-pJEVOLYbrvcUxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "227040916026-rjsun0ves4a89si1g6g9r5b5gkiv8qbt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "227040916026-on76spprkp0ecgpo2ijquk21a3pu415g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nsbmStudentAcademicTracker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
