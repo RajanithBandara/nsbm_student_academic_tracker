@@ -45,10 +45,12 @@ class AuthServiceSignup {
 
     if (user != null) {
       // Store (or update) the user's displayName and email in Firestore
-      await FirebaseFirestore.instance.collection('students').doc(user.uid).set({
+      await FirebaseFirestore.instance.collection('student').doc(user.uid).collection('credentials').add({
         'displayName': user.displayName,
         'email': user.email,
-      }, SetOptions(merge: true));
+        'timestamp': FieldValue.serverTimestamp(),
+        'lastLogin': FieldValue.serverTimestamp(),
+      });
     }
     return user;
   }
