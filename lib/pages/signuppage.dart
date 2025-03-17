@@ -171,9 +171,9 @@ class _SignUpPageState extends State<SignupPage>
                       SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                              onPressed: (){
+                              onPressed: _isGoogleSigning ? null : () async {
                                 HapticFeedback.heavyImpact();
-                              _isGoogleSigning ? null : _signUpWithGoogle;
+                                await _signUpWithGoogle();
                               },
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: theme.colorScheme.surface,
