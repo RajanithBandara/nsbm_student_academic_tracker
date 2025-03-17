@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nsbm_student_academic_tracker/pages/welcomescreen_2.dart';
+import 'package:nsbm_student_academic_tracker/pages/loginpage.dart';
+import 'package:nsbm_student_academic_tracker/pages/signuppage.dart';
 
-class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key});
+class WelcomeDetailsScreen extends StatefulWidget {
+  const WelcomeDetailsScreen({super.key});
 
   @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
+  State<WelcomeDetailsScreen> createState() => _WelcomeDetailsScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateMixin {
+class _WelcomeDetailsScreenState extends State<WelcomeDetailsScreen> with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _textOpacity;
   late final Animation<Offset> _textSlide;
@@ -20,13 +21,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
   void initState() {
     super.initState();
 
-    // Initialize the AnimationController with a 2-second duration.
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
 
-    // Text animation: fades in and slides from above.
     _textOpacity = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
@@ -43,7 +42,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
       ),
     );
 
-    // Button animation: fades in and slides from below.
     _buttonOpacity = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
@@ -60,7 +58,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
       ),
     );
 
-    // Start the animation.
     _controller.forward();
   }
 
@@ -79,49 +76,67 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-            // Animate the title text
             SlideTransition(
               position: _textSlide,
               child: FadeTransition(
                 opacity: _textOpacity,
-                child: Text(
-                  "Welcome To EduTrack",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                child: Column(
+                  children: [
+                    Text(
+                      "Track Your Academic Progress",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: Text(
+                        "EduTrack helps you manage your university modules, calculate GPA, set reminders, and stay on top of your academic journey!",
+                        style: TextStyle(
+                          fontSize: 17,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
             const SizedBox(height: 40),
-            // Animate the button
             SlideTransition(
               position: _buttonSlide,
               child: FadeTransition(
                 opacity: _buttonOpacity,
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: () {
                     HapticFeedback.heavyImpact();
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const WelcomeDetailsScreen()),
+                      MaterialPageRoute(builder: (context) => const SignupPage()),
                     );
                   },
+                  icon: Icon(
+                    Icons.arrow_forward,
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                  label: Text(
+                    "Last Step",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.surface,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     textStyle: const TextStyle(
                       fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                  child: Text(
-                    "Get Started",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.surface,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

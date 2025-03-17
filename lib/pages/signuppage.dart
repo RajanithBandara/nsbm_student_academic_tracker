@@ -6,7 +6,7 @@ import 'package:nsbm_student_academic_tracker/functions/signinfunction.dart';
 import 'package:nsbm_student_academic_tracker/functions/signupfunction.dart';
 import 'package:nsbm_student_academic_tracker/pages/emailverification.dart';
 import 'package:nsbm_student_academic_tracker/pages/homescreen.dart';
-import 'package:nsbm_student_academic_tracker/pages/loginpage.dart'; // <-- Import your AuthService
+import 'package:nsbm_student_academic_tracker/pages/loginpage.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -15,62 +15,66 @@ class SignupPage extends StatefulWidget {
   State<SignupPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignupPage> {
+class _SignUpPageState extends State<SignupPage>
+    with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _fullNameController = TextEditingController(); // For full name field
-
+  final _fullNameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
   bool _isSigningUp = false;
   bool _isGoogleSigning = false;
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _controller.forward();
+  }
 
   @override
   void dispose() {
+    _controller.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _fullNameController.dispose();
     super.dispose();
   }
 
-  // Create user with email/password using AuthService
   Future<void> _createUserWithPassword() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isSigningUp = true);
-
     try {
       final user = await AuthServiceSignup.createUserWithEmail(
         _emailController.text,
         _passwordController.text,
       );
-
       if (user != null) {
-        // Optionally store the user's full name in Firestore as well
-        // If you'd like to store fullName upon sign-up:
         await FirebaseFirestore.instance.collection('students').doc(user.uid).set({
           'displayName': _fullNameController.text.trim(),
           'email': user.email,
         }, SetOptions(merge: true));
-
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("User created successfully! Verification email sent."),
-          ),
+          const SnackBar(content: Text("User created successfully! Verification email sent.")),
         );
-
-        // Navigate to verification screen
         if (!mounted) return;
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => EmailVerificationScreen(user: user),
-          ),
+          MaterialPageRoute(builder: (context) => EmailVerificationScreen(user: user)),
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Show user-friendly error messages
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? "Signup failed!")),
       );
@@ -79,18 +83,14 @@ class _SignUpPageState extends State<SignupPage> {
     }
   }
 
-  // Sign up with Google using AuthService
   Future<void> _signUpWithGoogle() async {
     setState(() => _isGoogleSigning = true);
-
     try {
       final user = await AuthServiceSignup.signInWithGoogle();
       if (user != null) {
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Google Sign-In Successful!")),
         );
-        // Navigate to Home
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
@@ -98,7 +98,6 @@ class _SignUpPageState extends State<SignupPage> {
         );
       }
     } catch (e) {
-      // If AuthService throws, catch the error here
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Google Sign-In Failed: $e")),
       );
@@ -107,19 +106,13 @@ class _SignUpPageState extends State<SignupPage> {
     }
   }
 
-  // Helper method to return input decoration using theme colors.
   InputDecoration _inputDecoration(String label) {
     final theme = Theme.of(context);
     return InputDecoration(
       labelText: label,
-      labelStyle:
-      theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: theme.colorScheme.primary),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: theme.colorScheme.outline),
-      ),
+      labelStyle: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface),
+      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.primary)),
+      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: theme.colorScheme.outline)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
@@ -133,141 +126,87 @@ class _SignUpPageState extends State<SignupPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Sign Up",
-                    style: theme.textTheme.headlineLarge?.copyWith(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Create an account to get started",
-                    style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Full Name Field
-                  TextFormField(
-                    controller: _fullNameController,
-                    decoration: _inputDecoration("Full Name"),
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: theme.colorScheme.onSurface),
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? "Enter your full name"
-                        : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Email Field
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: _inputDecoration("Email"),
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: theme.colorScheme.onSurface),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? "Enter a valid email"
-                        : null,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Password Field
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: _inputDecoration("Password"),
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: theme.colorScheme.onSurface),
-                    validator: (value) =>
-                    (value == null || value.length < 6)
-                        ? "Password must be at least 6 characters"
-                        : null,
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Sign Up with Email/Password Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isSigningUp ? null : (){
-                        _createUserWithPassword();
-                        HapticFeedback.heavyImpact();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: _isSigningUp
-                          ? CircularProgressIndicator(
-                        color: theme.colorScheme.onPrimary,
-                      )
-                          : Text(
-                        "Sign Up",
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.onPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Sign Up with Google Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isGoogleSigning ? null : (){
-                        _signUpWithGoogle();
-                        HapticFeedback.heavyImpact();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.surface,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: _isGoogleSigning
-                          ? CircularProgressIndicator(
-                        color: theme.colorScheme.onSurface,
-                      )
-                          : Text(
-                        "Sign Up with Google",
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Already have an account? -> Sign in
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Already have an account?",
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Signin()),
-                          );
-                        },
-                        child: Text(
-                          "Login",
-                          style: theme.textTheme.labelLarge
-                              ?.copyWith(color: theme.colorScheme.primary),
-                        ),
+                      Text("Sign Up", style: theme.textTheme.headlineLarge?.copyWith(fontSize: 28, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Text("Create an account to get started", style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16)),
+                      const SizedBox(height: 30),
+                      TextFormField(
+                          controller: _fullNameController,
+                          decoration: _inputDecoration("Full Name"),
+                          validator: (value) => (value == null || value.isEmpty) ? "Enter your full name" : null),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                          controller: _emailController,
+                          decoration: _inputDecoration("Email"),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) => (value == null || value.isEmpty) ? "Enter a valid email" : null),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          decoration: _inputDecoration("Password"),
+                          validator: (value) => (value == null || value.length < 6) ? "Password must be at least 6 characters" : null),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              onPressed: _isSigningUp ? null : _createUserWithPassword,
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.primary,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 14)),
+                              child: _isSigningUp ? CircularProgressIndicator(
+                                  color: theme.colorScheme.onPrimary) : Text(
+                                  "Sign Up", style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onPrimary)))),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              onPressed: (){
+                                HapticFeedback.heavyImpact();
+                              _isGoogleSigning ? null : _signUpWithGoogle;
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.surface,
+                                  padding: const EdgeInsets.symmetric(vertical: 14)),
+                              child: _isGoogleSigning ? CircularProgressIndicator(
+                                  color: theme.colorScheme.onSurface
+                              ) : Text(
+                                  "Sign Up with Google",
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                      color: theme.colorScheme.onSurface
+                                  )))),
+                      const SizedBox( height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Already have an account? ", style: theme.textTheme.bodyMedium),
+                          TextButton(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const Signin()),
+                              );
+                            },
+                            child: Text(
+                                "Sign In",
+                                style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
+                          ),
+                          ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

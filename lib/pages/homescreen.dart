@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:nsbm_student_academic_tracker/pages/loginpage.dart'; // Make sure this import is correct
 import 'package:nsbm_student_academic_tracker/functions/signinfunction.dart'; // Ensure this is correctly imported
 
@@ -21,6 +22,7 @@ class _HomeScreen extends State<HomeScreen> {
   ];
 
   void _onItemTapped(int index) {
+    HapticFeedback.mediumImpact();
     setState(() {
       _selectedIndex = index;
     });
@@ -77,6 +79,7 @@ class _HomeScreen extends State<HomeScreen> {
               title: const Text("Home"),
               selected: _selectedIndex == 0,
               onTap: () {
+                HapticFeedback.mediumImpact();
                 setState(() {
                   _selectedIndex = 0;
                 });
@@ -88,6 +91,7 @@ class _HomeScreen extends State<HomeScreen> {
               title: const Text("Search"),
               selected: _selectedIndex == 1,
               onTap: () {
+                HapticFeedback.mediumImpact();
                 setState(() {
                   _selectedIndex = 1;
                 });
@@ -99,6 +103,7 @@ class _HomeScreen extends State<HomeScreen> {
               title: const Text("Profile"),
               selected: _selectedIndex == 2,
               onTap: () {
+                HapticFeedback.mediumImpact();
                 setState(() {
                   _selectedIndex = 2;
                 });
