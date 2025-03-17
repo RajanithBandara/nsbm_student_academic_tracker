@@ -25,7 +25,7 @@ class _WelcomeToProjectState extends State<WelcomeToProject>{
               height: 30,
             ),
             Text(
-              "Welcome To Project",
+              "Welcome To EduTrack",
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
