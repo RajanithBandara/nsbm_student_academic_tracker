@@ -45,6 +45,7 @@ dependencies:
   mockito: ^5.4.5
   google_sign_in: ^5.2.4
   fl_chart: ^0.70.2
+  table_calendar: ^3.2.0
 
 
 
