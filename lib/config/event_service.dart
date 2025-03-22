@@ -4,11 +4,10 @@ import 'package:nsbm_student_academic_tracker/models/event_model.dart';
 class EventService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Fetches events for a given user (uid) from Firestore and organizes them by day.
   Future<Map<DateTime, List<EventModel>>> fetchEvents(String uid) async {
     try {
       final querySnapshot = await _firestore
-          .collection('studentdata')
+          .collection('student')
           .doc(uid)
           .collection('events')
           .get();
@@ -34,7 +33,7 @@ class EventService {
   Future<EventModel?> sendEvent(String uid, EventModel newEvent) async {
     try {
       final docRef = await _firestore
-          .collection('studentdata')
+          .collection('student')
           .doc(uid)
           .collection('events')
           .add(newEvent.toMap());

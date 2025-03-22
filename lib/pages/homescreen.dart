@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'package:nsbm_student_academic_tracker/pages/loginpage.dart'; // Make sure this import is correct
-import 'package:nsbm_student_academic_tracker/functions/signinfunction.dart'; // Ensure this is correctly imported
+import 'package:nsbm_student_academic_tracker/pages/calenderpin.dart';
+import 'package:nsbm_student_academic_tracker/pages/loginpage.dart';
+import 'package:nsbm_student_academic_tracker/pages/homepage.dart';
+import 'package:nsbm_student_academic_tracker/pages/profilepage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreen();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreen extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  // List of widgets for different pages
-  static const List<Widget> _pages = <Widget>[
-    Center(child: Text("Home Page", style: TextStyle(fontSize: 18))),
-    Center(child: Text("Search Page", style: TextStyle(fontSize: 18))),
-    Center(child: Text("Profile Page", style: TextStyle(fontSize: 18))),
+  final List<Widget> _pages = [
+    const HomePage(),
+    const CalenderPin(),
+    const ProfilePage(),
+    const ProfilePage()
   ];
 
   void _onItemTapped(int index) {
@@ -27,22 +29,18 @@ class _HomeScreen extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
+
   Future<void> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Signin()),
+      );
     } catch (e) {
       print("Error signing out: $e");
     }
-  }
-
-  // Sign Out function
-  void _handleSignOut() async {
-    await signOut();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const Signin()),  // Navigate to Login page after sign out
-    );
   }
 
   @override
@@ -52,13 +50,11 @@ class _HomeScreen extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           "Welcome",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-        elevation: 0, // Material 3 elevation style
+        elevation: 0,
       ),
       drawer: Drawer(
         backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
@@ -70,7 +66,7 @@ class _HomeScreen extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface, // Text color
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -79,23 +75,17 @@ class _HomeScreen extends State<HomeScreen> {
               title: const Text("Home"),
               selected: _selectedIndex == 0,
               onTap: () {
-                HapticFeedback.mediumImpact();
-                setState(() {
-                  _selectedIndex = 0;
-                });
-                Navigator.pop(context);  // Close the drawer
+                _onItemTapped(0);
+                Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.search),
-              title: const Text("Search"),
+              leading: const Icon(Icons.calendar_month_rounded),
+              title: const Text("Events"),
               selected: _selectedIndex == 1,
               onTap: () {
-                HapticFeedback.mediumImpact();
-                setState(() {
-                  _selectedIndex = 1;
-                });
-                Navigator.pop(context);  // Close the drawer
+                _onItemTapped(1);
+                Navigator.pop(context);
               },
             ),
             ListTile(
@@ -103,24 +93,21 @@ class _HomeScreen extends State<HomeScreen> {
               title: const Text("Profile"),
               selected: _selectedIndex == 2,
               onTap: () {
-                HapticFeedback.mediumImpact();
-                setState(() {
-                  _selectedIndex = 2;
-                });
-                Navigator.pop(context);  // Close the drawer
+                _onItemTapped(2);
+                Navigator.pop(context);
               },
             ),
             const Spacer(),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text("Sign Out"),
-              onTap: _handleSignOut,  // Sign out when tapped
+              onTap: signOut,
             ),
             const SizedBox(height: 20),
           ],
         ),
       ),
-      body: _pages.elementAt(_selectedIndex),
+      body: _pages[_selectedIndex], // Change page dynamically
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
@@ -131,8 +118,12 @@ class _HomeScreen extends State<HomeScreen> {
             label: "Home",
           ),
           NavigationDestination(
-            icon: Icon(Icons.search),
-            label: "Search",
+            icon: Icon(Icons.calendar_month_rounded),
+            label: "Events",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.view_module_rounded),
+            label: "Modules",
           ),
           NavigationDestination(
             icon: Icon(Icons.person),
