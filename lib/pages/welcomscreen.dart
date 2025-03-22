@@ -72,62 +72,65 @@ class _WelcomeScreenState extends State<WelcomeScreen> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 30),
-            // Animate the title text
-            SlideTransition(
-              position: _textSlide,
-              child: FadeTransition(
-                opacity: _textOpacity,
-                child: Text(
-                  "Welcome To EduTrack",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 40),
-            // Animate the button
-            SlideTransition(
-              position: _buttonSlide,
-              child: FadeTransition(
-                opacity: _buttonOpacity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    HapticFeedback.heavyImpact();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const WelcomeDetailsScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    textStyle: const TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
+    // Wrap your Scaffold in a PopScope widget to enable predictive back gesture.
+    return PopScope(
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              // Animate the title text
+              SlideTransition(
+                position: _textSlide,
+                child: FadeTransition(
+                  opacity: _textOpacity,
                   child: Text(
-                    "Get Started",
+                    "Welcome To EduTrack",
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.surface,
-                      fontSize: 17,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 40),
+              // Animate the button
+              SlideTransition(
+                position: _buttonSlide,
+                child: FadeTransition(
+                  opacity: _buttonOpacity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      HapticFeedback.heavyImpact();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const WelcomeDetailsScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                    child: Text(
+                      "Get Started",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.surface,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
