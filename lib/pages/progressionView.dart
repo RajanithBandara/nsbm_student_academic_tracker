@@ -62,7 +62,39 @@ class _ProgressionPageState extends State<ProgressionPage> {
       ),
     );
   }
-
+  Widget _buildSemesterSelector() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.deepPurple,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: DropdownButton<String>(
+          value: selectedSemester,
+          dropdownColor: Colors.deepPurple,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedSemester = newValue!;
+            });
+          },
+          items: ['Last Semester', 'This Semester']
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
+          }).toList(),
+          underline: const SizedBox(),
+          icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+        ),
+      ),
+    );
+  }
 
 
   Widget _buildModuleProgressChart() {
@@ -257,5 +289,28 @@ class _ProgressionPageState extends State<ProgressionPage> {
         ),
       ),
     );
+  }
+  List<BarChartGroupData> _getModuleProgressData() {
+    if (selectedSemester == 'Last Semester') {
+      return [
+        BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 85, color: Colors.orange, width: 16, borderRadius: BorderRadius.circular(4))]),
+        BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 70, color: Colors.red, width: 16, borderRadius: BorderRadius.circular(4))]),
+        BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 100, color: Colors.green, width: 16, borderRadius: BorderRadius.circular(4))]),
+        BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 90, color: Colors.purple, width: 16, borderRadius: BorderRadius.circular(4))]),
+      ];
+    } else {
+      return [
+        BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 80, color: Colors.pink, width: 16, borderRadius: BorderRadius.circular(4))]),
+        BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 60, color: Colors.brown, width: 16, borderRadius: BorderRadius.circular(4))]),
+        BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 90, color: Colors.purple, width: 16, borderRadius: BorderRadius.circular(4))]),
+        BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 100, color: Colors.green, width: 16, borderRadius: BorderRadius.circular(4))]),
+      ];
+    }
+  }
+
+  List<String> _getModuleNames() {
+    return selectedSemester == 'Last Semester'
+        ? ['IOT', 'IMR', 'CGP', 'JAVA']
+        : ['IOT', 'MAD', 'SDTP', 'CGP'];
   }
 }
