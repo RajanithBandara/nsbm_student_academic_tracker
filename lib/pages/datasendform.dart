@@ -22,19 +22,22 @@ class _DataSendFormState extends State<DataSendForm> {
 
   Future<void> storeData() async {
     try {
+      // Debug: Check email value before submission
+      debugPrint("Email Entered: ${_emailController.text}");
+
       final userData = UserDataModel(
-        userName: _userNameController.text,
-        courseName: _courseNameController.text,
-        age: int.parse(_ageController.text),
-        idNumber: _idNumberController.text,
-        email: _emailController.text,
+        userName: _userNameController.text.trim(),
+        courseName: _courseNameController.text.trim(),
+        age: int.tryParse(_ageController.text) ?? 0,
+        idNumber: _idNumberController.text.trim(),
+        email: _emailController.text.trim(), // Trim spaces to avoid issues
         gpa: double.tryParse(_gpaController.text) ?? 0.0,
       );
 
       await FirebaseFirestore.instance
-          .collection("studentdata")
-          .doc(user!.uid)
-          .set(userData.toMap());
+          .collection("student")
+          .doc(user!.uid).collection("details")
+          .add(userData.toMap());
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -78,7 +81,6 @@ class _DataSendFormState extends State<DataSendForm> {
                   _buildTextField("Age", _ageController, Icons.cake, isNumber: true),
                   _buildTextField("ID Number", _idNumberController, Icons.perm_identity),
                   _buildTextField("Email", _emailController, Icons.email, isEmail: true),
-                  _buildTextField("GPA", _gpaController, Icons.grade, isNumber: true),
                   const SizedBox(height: 24),
                   Center(
                     child: ElevatedButton(
@@ -105,7 +107,8 @@ class _DataSendFormState extends State<DataSendForm> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {bool isNumber = false, bool isEmail = false}) {
+  Widget _buildTextField(String label, TextEditingController controller, IconData icon,
+      {bool isNumber = false, bool isEmail = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextFormField(
@@ -123,8 +126,8 @@ class _DataSendFormState extends State<DataSendForm> {
           if (isNumber && double.tryParse(value) == null) {
             return 'Enter a valid number';
           }
-          if (isEmail && !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$').hasMatch(value)) {
-            return 'Enter a valid email';
+          if (isEmail && !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$').hasMatch(value)) {
+            return 'Enter a valid email address';
           }
           return null;
         },

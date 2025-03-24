@@ -21,18 +21,18 @@ class _FetchDataState extends State<FetchData> {
           ? _buildNoUserWidget(context)
           : StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
-            .collection("studentdata")
+            .collection("student")
             .doc(user!.uid)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || !snapshot.data!.exists) {
+          if (!snapshot.hasData || snapshot.data?.data() == null) {
             return _buildNoDataWidget(context);
           }
 
-          // Convert the Firestore document data into a UserDataModel instance.
+          // Convert Firestore document data into a UserDataModel instance
           final data = snapshot.data!.data() as Map<String, dynamic>;
           final student = UserDataModel(
             userName: data['userName'] ?? '',

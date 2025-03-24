@@ -129,7 +129,7 @@ class _SigninState extends State<Signin> with TickerProviderStateMixin {
       if (userCredential != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const HomeScreenUi()),
         );
       }
     } catch (error) {
