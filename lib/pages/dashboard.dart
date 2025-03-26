@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 
+
 class DashboardScreen extends StatelessWidget {
 const DashboardScreen({super.key});
 
@@ -216,6 +217,40 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
       ),
     );
   }
+
+
+
+  Widget _buildSimplifiedBarChart() {
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildBar('M1', 0.65, Colors.blue),
+          _buildBar('M2', 0.4, Colors.green),
+          _buildBar('M3', 0.5, Colors.yellow),
+          _buildBar('M4', 0.85, Colors.orange),
+          _buildBar('M5', 0.6, Colors.red),
+          _buildBar('M6', 0.7, Colors.purple),
+          _buildBar('M7', 0.55, Colors.teal),
+        ],
+      ),
+    );
+  }
+
 
 
 
