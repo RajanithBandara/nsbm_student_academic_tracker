@@ -254,6 +254,32 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
   }
 
 
+  Widget _buildBar(String label, double height, Color color) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          width: 15,
+          height: 100 * height,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(4),
+              topRight: Radius.circular(4),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10),
+        ),
+      ],
+    );
+  }
+
+
+
 
 
 
