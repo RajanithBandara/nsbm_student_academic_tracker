@@ -397,6 +397,26 @@ Widget _buildEventsSection(BuildContext context) {
 }
 
 
+Widget _buildEventCard(String title, String time) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+     
+);
+}
+
+
 
 
 
