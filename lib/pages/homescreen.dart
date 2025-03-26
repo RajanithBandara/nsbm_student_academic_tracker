@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:nsbm_student_academic_tracker/pages/calenderpin.dart';
 import 'package:nsbm_student_academic_tracker/pages/datasendform.dart';
 import 'package:nsbm_student_academic_tracker/pages/fetcheddata.dart';
+import 'package:nsbm_student_academic_tracker/pages/gpapredictionpage.dart';
 import 'package:nsbm_student_academic_tracker/pages/moduledisplay.dart';
 import 'package:nsbm_student_academic_tracker/pages/progressionView.dart';
 import 'package:nsbm_student_academic_tracker/pages/settings.dart';
@@ -57,7 +58,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
   Widget _buildPage(int index) {
     switch (index) {
       case 0:
-        return WelcomeHome(userName: userName);
+        return const GpaPredictionPage();
       case 1:
         return const ModuleAddition();
       case 2:
