@@ -380,6 +380,22 @@ Widget _buildTaskCard(BuildContext context, String title) {
 }
 
 
+Widget _buildEventsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Events', 'Upcoming events', true),
+        const SizedBox(height: 16),
+        Column(
+          children: List.generate(
+            3,
+                (index) => _buildEventCard('Noah\'s Birthday', '10:00 am to 12:00 pm'),
+          ),
+        ),
+   ],
+);
+}
+
 
 
 
