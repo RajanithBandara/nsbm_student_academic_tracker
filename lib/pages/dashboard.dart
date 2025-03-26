@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 class DashboardScreen extends StatelessWidget {
 const DashboardScreen({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +43,8 @@ const DashboardScreen({super.key});
               ),
               const SizedBox(height: 20),
               _buildModulesSection(context),
+               const SizedBox(height: 24),
+              _buildProgressionSection(),
               
             ],
           ),
@@ -173,9 +177,33 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
 
 
 
+  Widget _buildProgressionSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Progression',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(child: _buildProgressPieChart()),
+            const SizedBox(width: 16),
+            Expanded(child:_buildSimplifiedBarChart()),
+
+          ],
+        ),
+      ],
+    );
+  }
 
 
-  
+
+
+
+
+
 }
 
 
