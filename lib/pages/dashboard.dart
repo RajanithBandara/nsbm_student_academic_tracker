@@ -281,6 +281,25 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
 
 
 
+Widget _buildTasksSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Tasks', '', true),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: List.generate(
+            4,
+                (index) => _buildTaskCard(context, 'Marketing project at School'),
+          ),
+        ),
+      ],
+    );
+  }
+
+
 
 
 
