@@ -299,9 +299,17 @@ Widget _buildTasksSection(BuildContext context) {
                 (index) => _buildTaskCard(context, 'Marketing project at School'),
           ),
         ),
-      ],
-    );
-  }
+   ],
+);
+}
+
+
+Widget _buildTaskCard(BuildContext context, String title) {
+    return Container(
+     
+ ),
+         
+}
 
 
 
