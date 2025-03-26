@@ -48,3 +48,13 @@ const DashboardScreen({super.key});
       ),
     );
   }
+
+
+   Widget _buildModulesSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      
+        ),
+      ],
+    );
+  }
