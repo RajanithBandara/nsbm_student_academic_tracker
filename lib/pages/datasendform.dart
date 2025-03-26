@@ -36,8 +36,8 @@ class _DataSendFormState extends State<DataSendForm> {
 
       await FirebaseFirestore.instance
           .collection("student")
-          .doc(user!.uid).collection("details")
-          .add(userData.toMap());
+          .doc(user!.uid)
+          .set(userData.toMap());
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
