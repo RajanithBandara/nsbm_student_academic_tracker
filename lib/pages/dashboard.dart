@@ -12,24 +12,7 @@ const DashboardScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2C5F75),
-        title: const Text(''),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
-          ),
-        ],
+      appBar: AppBar( 
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -42,6 +25,8 @@ const DashboardScreen({super.key});
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: Colors.green,
+
                 ),
               ),
               const SizedBox(height: 20),
