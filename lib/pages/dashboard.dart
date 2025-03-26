@@ -33,6 +33,10 @@ const DashboardScreen({super.key});
               _buildModulesSection(context),
                const SizedBox(height: 24),
               _buildProgressionSection(),
+              const SizedBox(height: 24),
+              _buildTasksSection(context),
+              const SizedBox(height: 24),
+              _buildEventsSection(context),
               
             ],
           ),
@@ -266,11 +270,181 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
 
 
 
+Widget _buildTasksSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Tasks', '', true),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: List.generate(
+            4,
+                (index) => _buildTaskCard(context, 'Marketing project at School'),
+          ),
+        ),
+   ],
+);
+}
 
 
+Widget _buildTaskCard(BuildContext context, String title) {
+    return Container(
+      width: MediaQuery.of(context).size.width / 2 - 24,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '10 Dec 2023',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  '13:00',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Icon(
+                  Icons.menu,
+                  size: 16,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ],
+   ),
+);
+}
 
 
+Widget _buildEventsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Events', 'Upcoming events', true),
+        const SizedBox(height: 16),
+        Column(
+          children: List.generate(
+            3,
+                (index) => _buildEventCard('Noah\'s Birthday', '10:00 am to 12:00 pm'),
+          ),
+        ),
+   ],
+);
+}
 
+
+Widget _buildEventCard(String title, String time) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey,
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+       child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.calendar_today,
+              size: 20,
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  time,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.chevron_right,
+            color: Colors.grey,
+          ),
+        ],
+   ),
+);
+}
+     
+
+     
 }
 
 
