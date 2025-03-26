@@ -12,6 +12,7 @@ import 'package:nsbm_student_academic_tracker/pages/loginpage.dart';
 import 'package:nsbm_student_academic_tracker/pages/timer.dart';
 import 'package:nsbm_student_academic_tracker/pages/todolist.dart';
 import 'moduleaddition.dart';
+import 'package:nsbm_student_academic_tracker/pages/dashboard.dart';
 
 class HomeScreenUi extends StatefulWidget {
   const HomeScreenUi({super.key});
@@ -42,7 +43,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
   }
 
   final List<String> _pageTitles = [
-    "Home",               // 0: Bottom nav
+    "My Dashboard",        // 0: Bottom nav
     "Add Modules",        // 1: Bottom nav
     "Your Data",          // 2: Bottom nav
     "Modules",            // 3: Bottom nav
@@ -57,7 +58,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
   Widget _buildPage(int index) {
     switch (index) {
       case 0:
-        return WelcomeHome(userName: userName);
+        return DashboardScreen();
       case 1:
         return const ModuleAddition();
       case 2:
