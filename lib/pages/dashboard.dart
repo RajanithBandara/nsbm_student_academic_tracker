@@ -122,7 +122,63 @@ const DashboardScreen({super.key});
   }
 
 
+Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (subtitle.isNotEmpty)
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+          ],
+        ),
+        if (showMore && title != 'Progression')
+          TextButton(
+            onPressed: () {},
+            child: Row(
+              children: const [
+                Text(
+                  'More',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.blue,
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  size: 16,
+                  color: Colors.blue,
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
 
 
 
+
+
+  
 }
+
+
+
+
+
