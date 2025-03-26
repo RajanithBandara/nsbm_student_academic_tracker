@@ -50,11 +50,40 @@ const DashboardScreen({super.key});
   }
 
 
-   Widget _buildModulesSection(BuildContext context) {
+    Widget _buildModulesSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      
+      children: [
+        _buildSectionHeader('Modules', 'Your running modules', true),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildModuleCard(
+                'Mathematics for Programming',
+                Icons.calculate,
+                const Color(0xFF2C5F75),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildModuleCard(
+                'HCI',
+                Icons.desktop_windows,
+                const Color(0xFF2C5F75),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildModuleCard(
+                'Object Oriented Programming (OOP)',
+                Icons.code,
+                const Color(0xFF2C5F75),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
+}
