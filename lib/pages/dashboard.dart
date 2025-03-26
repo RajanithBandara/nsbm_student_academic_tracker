@@ -200,6 +200,25 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
 
 
 
+   Widget _buildProgressPieChart() {
+    return SizedBox(
+      height: 200,
+      child: PieChart(
+        PieChartData(
+          sections: [
+            PieChartSectionData(value: 25, color: Colors.red, title: '25%'),
+            PieChartSectionData(value: 50, color: Colors.yellow, title: '50%'),
+            PieChartSectionData(value: 25, color: Colors.green, title: '25%'),
+          ],
+          sectionsSpace: 2,
+          centerSpaceRadius: 40,
+        ),
+      ),
+    );
+  }
+
+
+
 
 
 
