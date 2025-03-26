@@ -48,6 +48,10 @@ const DashboardScreen({super.key});
               _buildModulesSection(context),
                const SizedBox(height: 24),
               _buildProgressionSection(),
+              const SizedBox(height: 24),
+              _buildTasksSection(context),
+              const SizedBox(height: 24),
+              _buildEventsSection(context),
               
             ],
           ),
@@ -298,6 +302,7 @@ Widget _buildTasksSection(BuildContext context) {
       ],
     );
   }
+
 
 
 
