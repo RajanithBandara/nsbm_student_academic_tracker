@@ -54,3 +54,42 @@ class _GpaPredictionPageState extends State<GpaPredictionPage> {
     });
     HapticFeedback.heavyImpact();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
+      body: FutureBuilder<List<ModuleModel>>(
+        future: futureModules,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LinearProgressIndicator();
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("No modules found."));
+          }
+          List<ModuleModel> modules = snapshot.data!;
+          Map<int, List<ModuleModel>> groupedModules = GpaPredictionSystem.groupModulesBySemester(modules);
+          Map<int, double> semesterGPA = GpaPredictionSystem.calculateSemesterGPA(groupedModules);
+          double predictedGPA = GpaPredictionSystem.predictFinalGPA(semesterGPA, widget.totalSemesters);
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              refreshData();
+            },
+            child: ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                GpaDetailsCard(
+                  semesterGPA: semesterGPA,
+                  predictedGPA: predictedGPA,
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
