@@ -230,16 +230,8 @@ class _SigninState extends State<Signin> with TickerProviderStateMixin {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                 // Add Logo here
                   Padding(
-                    padding: const EdgeInsets.only(top: 60), 
-                    child: Image.asset(
-                      'assets/EduTrack_logo.png', 
-                    ),
-                  ),
-                  // Welcome text with combined fade, slide, and scale animations.
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.only(top: 150),
                     child: AnimatedBuilder(
                       animation: _textAnimationController,
                       builder: (context, child) {
@@ -251,7 +243,7 @@ class _SigninState extends State<Signin> with TickerProviderStateMixin {
                               scale: _textScaleAnimation.value,
                               child: Center(
                                 child: Text(
-                                  "Welcome",
+                                  "Welcome to EduTrack",
                                   style: theme.textTheme.headlineLarge?.copyWith(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
@@ -263,6 +255,12 @@ class _SigninState extends State<Signin> with TickerProviderStateMixin {
                           ),
                         );
                       },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 40),
+                    child: Image.asset(
+                      'lib/assets/EduTrack.png',
                     ),
                   ),
                 ],
