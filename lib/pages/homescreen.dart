@@ -1,136 +1,260 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:nsbm_student_academic_tracker/pages/calenderpin.dart';
+import 'package:nsbm_student_academic_tracker/pages/datasendform.dart';
+import 'package:nsbm_student_academic_tracker/pages/fetcheddata.dart';
+import 'package:nsbm_student_academic_tracker/pages/moduledisplay.dart';
+import 'package:nsbm_student_academic_tracker/pages/progressionView.dart';
+import 'package:nsbm_student_academic_tracker/pages/settings.dart';
 import 'package:nsbm_student_academic_tracker/pages/loginpage.dart';
-import 'package:nsbm_student_academic_tracker/pages/homepage.dart';
-import 'package:nsbm_student_academic_tracker/pages/profilepage.dart';
+import 'package:nsbm_student_academic_tracker/pages/timer.dart';
+import 'package:nsbm_student_academic_tracker/pages/todolist.dart';
+import 'moduleaddition.dart';
+import 'package:nsbm_student_academic_tracker/pages/dashboard.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreenUi extends StatefulWidget {
+  const HomeScreenUi({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreenUi> createState() => _HomeScreenUiState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+class _HomeScreenUiState extends State<HomeScreenUi> {
+  String userName = "Loading...";
+  int _selectedPageIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const CalenderPin(),
-    const ProfilePage(),
-    const ProfilePage()
-  ];
+  @override
+  void initState() {
+    super.initState();
+    getUserName();
 
-  void _onItemTapped(int index) {
-    HapticFeedback.mediumImpact();
-    setState(() {
-      _selectedIndex = index;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      BackGestureHandler.init(context);
     });
   }
 
-  Future<void> signOut() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Signin()),
-      );
-    } catch (e) {
-      print("Error signing out: $e");
+  void getUserName() {
+    User? user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      userName = user?.displayName ?? "User Not Logged In";
+    });
+  }
+
+  final List<String> _pageTitles = [
+    "My Dashboard",        // 0: Bottom nav
+    "Add Modules",        // 1: Bottom nav
+    "Your Data",          // 2: Bottom nav
+    "Modules",            // 3: Bottom nav
+    "Progression",        // 4: Bottom nav
+    "Enter your Data",    // 5: Drawer
+    "To Do List",       // 6: Drawer
+    "Timer",
+    "Calender",
+    "Settings"         // 7: Drawer
+  ];
+
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return DashboardScreen();
+      case 1:
+        return const ModuleAddition();
+      case 2:
+        return const FetchData();
+      case 3:
+        return const ModulesPage();
+      case 4:
+        return const ProgressionPage();
+      case 5:
+        return const DataSendForm();
+      case 6:
+        return TodoPage();
+      case 7:
+        return TimerPage();
+      case 8:
+        return const CalenderPin();
+      case 9:
+        return const Settings();
+      default:
+        return Container();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<String> bottomNavTitles = _pageTitles.sublist(0, 5);
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
       appBar: AppBar(
-        title: const Text(
-          "Welcome",
-          style: TextStyle(fontWeight: FontWeight.bold),
+        automaticallyImplyLeading: true, // shows the drawer icon
+        title: Text(
+          _pageTitles[_selectedPageIndex],
+          style: Theme.of(context).textTheme.headlineLarge,
         ),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Signin()),
+              );
+              HapticFeedback.heavyImpact();
+            },
+          ),
+        ],
         backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-        elevation: 0,
       ),
-      drawer: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
-        child: Column(
-          children: [
-            DrawerHeader(
-              child: Text(
-                "Menu",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+      // Drawer navigation for extra pages.
+      drawer: NavigationDrawer(
+        selectedIndex: _selectedPageIndex >= 5 ? _selectedPageIndex - 5 : null,
+        onDestinationSelected: (int index) {
+          Navigator.pop(context);
+          setState(() {
+            _selectedPageIndex = index + 5;
+          });
+          HapticFeedback.lightImpact();
+        },
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              "Menu",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text("Home"),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                _onItemTapped(0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.calendar_month_rounded),
-              title: const Text("Events"),
-              selected: _selectedIndex == 1,
-              onTap: () {
-                _onItemTapped(1);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text("Profile"),
-              selected: _selectedIndex == 2,
-              onTap: () {
-                _onItemTapped(2);
-                Navigator.pop(context);
-              },
-            ),
-            const Spacer(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Sign Out"),
-              onTap: signOut,
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          ),
+          const NavigationDrawerDestination(
+            icon: Icon(Icons.add_box),
+            label: Text("Enter your Data"),
+          ),
+          const NavigationDrawerDestination(
+            icon: Icon(Icons.list),
+            label: Text("To Do List"),
+          ),
+          const NavigationDrawerDestination(
+              icon: Icon(Icons.timer),
+              label: Text("Timer")
+          ),
+          const NavigationDrawerDestination(
+              icon: Icon(Icons.calendar_month_rounded),
+              label: Text("Calender")
+          ),
+          const NavigationDrawerDestination(
+            icon: Icon(Icons.settings),
+            label: Text("Settings"),
+          ),
+        ],
       ),
-      body: _pages[_selectedIndex], // Change page dynamically
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.1, 0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _buildPage(_selectedPageIndex),
+      ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: _onItemTapped,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        destinations: const [
+        selectedIndex: _selectedPageIndex < 5 ? _selectedPageIndex : 0,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedPageIndex = index;
+          });
+          HapticFeedback.lightImpact();
+        },
+        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home),
-            label: "Home",
+            icon: const Icon(CupertinoIcons.home),
+            label: bottomNavTitles[0],
           ),
           NavigationDestination(
-            icon: Icon(Icons.calendar_month_rounded),
-            label: "Events",
+            icon: const Icon(CupertinoIcons.add),
+            label: bottomNavTitles[1],
           ),
           NavigationDestination(
-            icon: Icon(Icons.view_module_rounded),
-            label: "Modules",
+            icon: const Icon(Icons.info),
+            label: bottomNavTitles[2],
           ),
           NavigationDestination(
-            icon: Icon(Icons.person),
-            label: "Profile",
+            icon: const Icon(Icons.account_tree_outlined),
+            label: bottomNavTitles[3],
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.ssid_chart),
+            label: bottomNavTitles[4],
           ),
         ],
       ),
     );
+  }
+}
+
+class WelcomeHome extends StatelessWidget {
+  final String userName;
+  const WelcomeHome({super.key, required this.userName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.account_circle,
+            size: 100,
+            color: Theme.of(context).iconTheme.color,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            "Welcome!",
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            userName,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BackGestureHandler {
+  static const MethodChannel _channel = MethodChannel('predictive_back_channel');
+
+  static Future<bool> _handleBackGesture(BuildContext context) async {
+    final state = context.findAncestorStateOfType<_HomeScreenUiState>();
+    if (state != null && state._selectedPageIndex != 0) {
+      state.setState(() {
+        state._selectedPageIndex = 0;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  static void init(BuildContext context) {
+    _channel.setMethodCallHandler((MethodCall call) async {
+      if (call.method == 'onPredictiveBack') {
+        return _handleBackGesture(context);
+      }
+      return null;
+    });
   }
 }

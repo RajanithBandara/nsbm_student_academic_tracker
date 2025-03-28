@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../models/usermodel.dart'; // Import the StudentModel
+import '../models/userdata_model.dart'; // Ensure UserDataModel is imported
 
 class FetchData extends StatefulWidget {
   const FetchData({super.key});
@@ -21,20 +21,27 @@ class _FetchDataState extends State<FetchData> {
           ? _buildNoUserWidget(context)
           : StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
-            .collection("studentdata")
+            .collection("student")
             .doc(user!.uid)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || !snapshot.data!.exists) {
+          if (!snapshot.hasData || snapshot.data?.data() == null) {
             return _buildNoDataWidget(context);
           }
 
-          // Convert the Firestore document data into a StudentModel instance.
+          // Convert Firestore document data into a UserDataModel instance
           final data = snapshot.data!.data() as Map<String, dynamic>;
-          final student = StudentModel.fromMap(data);
+          final student = UserDataModel(
+            userName: data['userName'] ?? '',
+            courseName: data['courseName'] ?? '',
+            age: data['age'] ?? 0,
+            idNumber: data['idNumber'] ?? '',
+            email: data['email'] ?? '',
+            gpa: (data['gpa'] ?? 0.0).toDouble(),
+          );
 
           return SingleChildScrollView(
             child: Padding(
@@ -43,6 +50,11 @@ class _FetchDataState extends State<FetchData> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildAvatar(context),
+                  const SizedBox(height: 10),
+                  Text(
+                    student.userName,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
                   const SizedBox(height: 20),
                   _buildInfoCard(
                     context,
@@ -67,6 +79,12 @@ class _FetchDataState extends State<FetchData> {
                     Icons.email,
                     "Email",
                     student.email,
+                  ),
+                  _buildInfoCard(
+                    context,
+                    Icons.star,
+                    "GPA",
+                    student.gpa.toStringAsFixed(2),
                   ),
                 ],
               ),

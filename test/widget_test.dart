@@ -21,7 +21,7 @@ void main() {
 
     await tester.pumpWidget(MyApp(isFirstTime: false, user: mockUser));
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(HomeScreenUi), findsOneWidget);
   });
 
   testWidgets('App starts with WelcomeScreen for first-time users', (WidgetTester tester) async {

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../models/userdata_model.dart'; // Import your StudentModel
+import '../models/userdata_model.dart';
 
 class DataSendForm extends StatefulWidget {
   const DataSendForm({super.key});
@@ -12,36 +12,41 @@ class DataSendForm extends StatefulWidget {
 
 class _DataSendFormState extends State<DataSendForm> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _courseNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _idNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _gpaController = TextEditingController();
   final User? user = FirebaseAuth.instance.currentUser;
 
   Future<void> storeData() async {
     try {
-      // Create a StudentModel instance from form inputs
-      final student = StudentModel(
-        courseName: _courseNameController.text,
-        age: int.parse(_ageController.text),
-        idNumber: _idNumberController.text,
-        email: _emailController.text,
+      // Debug: Check email value before submission
+      debugPrint("Email Entered: ${_emailController.text}");
+
+      final userData = UserDataModel(
+        userName: _userNameController.text.trim(),
+        courseName: _courseNameController.text.trim(),
+        age: int.tryParse(_ageController.text) ?? 0,
+        idNumber: _idNumberController.text.trim(),
+        email: _emailController.text.trim(), // Trim spaces to avoid issues
+        gpa: double.tryParse(_gpaController.text) ?? 0.0,
       );
 
-      // Use the model's toMap() method when storing the data in Firestore
       await FirebaseFirestore.instance
-          .collection("studentdata")
+          .collection("student")
           .doc(user!.uid)
-          .set(student.toMap());
+          .set(userData.toMap());
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Data sent successfully")),
       );
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Data submission failed!")),
+        SnackBar(content: Text("Data submission failed: ${e.toString()}")),
       );
     }
   }
@@ -71,104 +76,11 @@ class _DataSendFormState extends State<DataSendForm> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _courseNameController,
-                    decoration: InputDecoration(
-                      labelText: "Course Name",
-                      prefixIcon: const Icon(Icons.book),
-                      labelStyle: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.primary),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.outline),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter course name';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _ageController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "Age",
-                      prefixIcon: const Icon(Icons.cake),
-                      labelStyle: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.primary),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.outline),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your age';
-                      } else if (int.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _idNumberController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "ID Number",
-                      prefixIcon: const Icon(Icons.perm_identity),
-                      labelStyle: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.primary),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.outline),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter ID number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: "Student Email",
-                      prefixIcon: const Icon(Icons.email),
-                      labelStyle: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.primary),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.outline),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter email';
-                      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                        return 'Enter a valid email address';
-                      }
-                      return null;
-                    },
-                  ),
+                  _buildTextField("User Name", _userNameController, Icons.person),
+                  _buildTextField("Course Name", _courseNameController, Icons.book),
+                  _buildTextField("Age", _ageController, Icons.cake, isNumber: true),
+                  _buildTextField("ID Number", _idNumberController, Icons.perm_identity),
+                  _buildTextField("Email", _emailController, Icons.email, isEmail: true),
                   const SizedBox(height: 24),
                   Center(
                     child: ElevatedButton(
@@ -195,12 +107,42 @@ class _DataSendFormState extends State<DataSendForm> {
     );
   }
 
+  Widget _buildTextField(String label, TextEditingController controller, IconData icon,
+      {bool isNumber = false, bool isEmail = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: isNumber ? TextInputType.number : (isEmail ? TextInputType.emailAddress : TextInputType.text),
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter $label';
+          }
+          if (isNumber && double.tryParse(value) == null) {
+            return 'Enter a valid number';
+          }
+          if (isEmail && !RegExp(r'^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$').hasMatch(value)) {
+            return 'Enter a valid email address';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
   @override
   void dispose() {
+    _userNameController.dispose();
     _courseNameController.dispose();
     _ageController.dispose();
     _idNumberController.dispose();
     _emailController.dispose();
+    _gpaController.dispose();
     super.dispose();
   }
 }
