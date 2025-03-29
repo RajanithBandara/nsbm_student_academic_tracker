@@ -31,6 +31,13 @@ class ProgressionPage extends StatefulWidget {
 class _ProgressionPageState extends State<ProgressionPage> {
   String selectedSemester = 'This Semester';
 
+  // Controllers for user input
+  final TextEditingController aController = TextEditingController();
+  final TextEditingController bController = TextEditingController();
+  final TextEditingController cController = TextEditingController();
+  final TextEditingController dController = TextEditingController();
+  final TextEditingController fController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +60,9 @@ class _ProgressionPageState extends State<ProgressionPage> {
               const SizedBox(height: 20),
               _buildSemesterSelector(),
               const SizedBox(height: 30),
-              _buildModuleProgressChart(),
+              _buildGradeInputFields(),
+              const SizedBox(height: 30),
+              _buildGradeDistributionChart(),
               const SizedBox(height: 30),
               _buildGpaProgressionChart(),
             ],
@@ -62,6 +71,7 @@ class _ProgressionPageState extends State<ProgressionPage> {
       ),
     );
   }
+
   Widget _buildSemesterSelector() {
     return Align(
       alignment: Alignment.centerLeft,
@@ -96,8 +106,7 @@ class _ProgressionPageState extends State<ProgressionPage> {
     );
   }
 
-
-  Widget _buildModuleProgressChart() {
+  Widget _buildGradeInputFields() {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -109,7 +118,59 @@ class _ProgressionPageState extends State<ProgressionPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Module Completion',
+              'Enter Your Grades',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepPurple,
+              ),
+            ),
+            const SizedBox(height: 10),
+            _buildTextField('A\'s:', aController),
+            _buildTextField('B\'s:', bController),
+            _buildTextField('C\'s:', cController),
+            _buildTextField('D\'s:', dController),
+            _buildTextField('F\'s:', fController),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {});
+              },
+              child: const Text('Update Chart'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: TextField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGradeDistributionChart() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Grade Distribution',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -121,47 +182,11 @@ class _ProgressionPageState extends State<ProgressionPage> {
             const SizedBox(height: 10),
             SizedBox(
               height: 250,
-              child: BarChart(
-                BarChartData(
-                  barGroups: _getModuleProgressData(),
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 20,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          return Text('${value.toInt()}%');
-                        },
-                      ),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, meta) {
-                          List<String> modules = _getModuleNames();
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Transform.rotate(
-                              angle: -0.5,
-                              child: Text(
-                                modules[value.toInt()],
-                                style: const TextStyle(fontSize: 12),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: true),
-                  gridData: const FlGridData(show: true),
-                  barTouchData: BarTouchData(enabled: true),
+              child: PieChart(
+                PieChartData(
+                  sections: _getGradeData(),
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 40,
                 ),
               ),
             ),
@@ -169,6 +194,42 @@ class _ProgressionPageState extends State<ProgressionPage> {
         ),
       ),
     );
+  }
+
+  List<PieChartSectionData> _getGradeData() {
+    final grades = {
+      'A': int.tryParse(aController.text) ?? 0,
+      'B': int.tryParse(bController.text) ?? 0,
+      'C': int.tryParse(cController.text) ?? 0,
+      'D': int.tryParse(dController.text) ?? 0,
+      'F': int.tryParse(fController.text) ?? 0,
+    };
+
+    return grades.entries.map((entry) {
+      return PieChartSectionData(
+        title: '${entry.key}: ${entry.value}',
+        value: entry.value.toDouble(),
+        color: _getGradeColor(entry.key),
+        radius: 50,
+      );
+    }).toList();
+  }
+
+  Color _getGradeColor(String grade) {
+    switch (grade) {
+      case 'A':
+        return Colors.green;
+      case 'B':
+        return Colors.blue;
+      case 'C':
+        return Colors.orange;
+      case 'D':
+        return Colors.red;
+      case 'F':
+        return Colors.black;
+      default:
+        return Colors.grey;
+    }
   }
 
   Widget _buildGpaProgressionChart() {
@@ -197,9 +258,6 @@ class _ProgressionPageState extends State<ProgressionPage> {
               height: 250,
               child: LineChart(
                 LineChartData(
-                  minX: 0,
-                  minY: 0,
-                  maxY: 4,
                   lineBarsData: [
                     LineChartBarData(
                       spots: const [
@@ -208,80 +266,12 @@ class _ProgressionPageState extends State<ProgressionPage> {
                         FlSpot(2, 3.0),
                         FlSpot(3, 3.7),
                         FlSpot(4, 3.3),
-                        FlSpot(5, 3.0),
-                        FlSpot(6, 3.0),
-                        FlSpot(7, 3.3),
                       ],
                       isCurved: true,
                       color: Colors.deepPurple,
                       barWidth: 4,
-                      belowBarData: BarAreaData(show: false),
-                      dotData: const FlDotData(show: true),
                     ),
                   ],
-                  titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 0.5,
-                        getTitlesWidget: (value, meta) {
-                          return Text(value.toStringAsFixed(1));
-                        },
-                      ),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          List<String> semesters = [
-                            'Y1S1', 'Y1S2', 'Y2S1', 'Y2S2',
-                            'Y3S1', 'Y3S2', 'Y4S1', 'Y4S2'
-                          ];
-                          if (value.toInt() >= 0 && value.toInt() < semesters.length) {
-                            return Transform.rotate(
-                              angle: -0.5,
-                              child: Text(
-                                semesters[value.toInt()],
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            );
-                          } else {
-                            return const Text("");
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: true),
-                  gridData: const FlGridData(show: true),
-                  lineTouchData: LineTouchData(
-                    touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (LineBarSpot touchedSpot) => Colors.deepPurple,
-                      getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                        return touchedSpots.map((spot) {
-                          double gpa = spot.y;
-                          String gpaClass;
-                          if (gpa >= 3.7) {
-                            gpaClass = 'First Class';
-                          } else if (gpa >= 3.3) {
-                            gpaClass = 'Second Upper';
-                          } else if (gpa >= 3.0) {
-                            gpaClass = 'Second Lower';
-                          } else {
-                            gpaClass = 'General Pass';
-                          }
-                          return LineTooltipItem(
-                            'GPA: ${gpa.toStringAsFixed(2)}\nClass: $gpaClass',
-                            const TextStyle(color: Colors.white, fontSize: 14),
-                          );
-                        }).toList();
-                      },
-                    ),
-                    touchCallback: (FlTouchEvent event, LineTouchResponse? response) {},
-                  ),
                 ),
               ),
             ),
@@ -289,28 +279,5 @@ class _ProgressionPageState extends State<ProgressionPage> {
         ),
       ),
     );
-  }
-  List<BarChartGroupData> _getModuleProgressData() {
-    if (selectedSemester == 'Last Semester') {
-      return [
-        BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 85, color: Colors.orange, width: 16, borderRadius: BorderRadius.circular(4))]),
-        BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 70, color: Colors.red, width: 16, borderRadius: BorderRadius.circular(4))]),
-        BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 100, color: Colors.green, width: 16, borderRadius: BorderRadius.circular(4))]),
-        BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 90, color: Colors.purple, width: 16, borderRadius: BorderRadius.circular(4))]),
-      ];
-    } else {
-      return [
-        BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 80, color: Colors.pink, width: 16, borderRadius: BorderRadius.circular(4))]),
-        BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 60, color: Colors.brown, width: 16, borderRadius: BorderRadius.circular(4))]),
-        BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 90, color: Colors.purple, width: 16, borderRadius: BorderRadius.circular(4))]),
-        BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 100, color: Colors.green, width: 16, borderRadius: BorderRadius.circular(4))]),
-      ];
-    }
-  }
-
-  List<String> _getModuleNames() {
-    return selectedSemester == 'Last Semester'
-        ? ['IOT', 'IMR', 'CGP', 'JAVA']
-        : ['IOT', 'MAD', 'SDTP', 'CGP'];
   }
 }
