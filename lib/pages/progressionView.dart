@@ -29,14 +29,25 @@ class ProgressionPage extends StatefulWidget {
 }
 
 class _ProgressionPageState extends State<ProgressionPage> {
-  String selectedSemester = 'This Semester';
+  String selectedYear = '1st Year';
+  int? touchedIndex;
 
-  // Controllers for user input
-  final TextEditingController aController = TextEditingController();
-  final TextEditingController bController = TextEditingController();
-  final TextEditingController cController = TextEditingController();
-  final TextEditingController dController = TextEditingController();
-  final TextEditingController fController = TextEditingController();
+  final Map<String, int> grades = {
+    'A+': 5,
+    'A': 7,
+    'A-': 4,
+    'B+': 3,
+    'B': 4,
+    'B-': 3,
+    'Others': 10,
+  };
+
+  final Map<String, int> othersGrades = {
+    'C+': 2,
+    'C': 3,
+    'C-': 2,
+    'D': 3,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +64,12 @@ class _ProgressionPageState extends State<ProgressionPage> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
+                    color: Colors.black,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              _buildSemesterSelector(),
-              const SizedBox(height: 30),
-              _buildGradeInputFields(),
+              _buildYearSelector(),
               const SizedBox(height: 30),
               _buildGradeDistributionChart(),
               const SizedBox(height: 30),
@@ -72,7 +81,7 @@ class _ProgressionPageState extends State<ProgressionPage> {
     );
   }
 
-  Widget _buildSemesterSelector() {
+  Widget _buildYearSelector() {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
@@ -82,14 +91,14 @@ class _ProgressionPageState extends State<ProgressionPage> {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: DropdownButton<String>(
-          value: selectedSemester,
+          value: selectedYear,
           dropdownColor: Colors.deepPurple,
           onChanged: (String? newValue) {
             setState(() {
-              selectedSemester = newValue!;
+              selectedYear = newValue!;
             });
           },
-          items: ['Last Semester', 'This Semester']
+          items: ['1st Year', '2nd Year', '3rd Year', '4th Year']
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -101,58 +110,6 @@ class _ProgressionPageState extends State<ProgressionPage> {
           }).toList(),
           underline: const SizedBox(),
           icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGradeInputFields() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Enter Your Grades',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildTextField('A\'s:', aController),
-            _buildTextField('B\'s:', bController),
-            _buildTextField('C\'s:', cController),
-            _buildTextField('D\'s:', dController),
-            _buildTextField('F\'s:', fController),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {});
-              },
-              child: const Text('Update Chart'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
         ),
       ),
     );
@@ -182,12 +139,67 @@ class _ProgressionPageState extends State<ProgressionPage> {
             const SizedBox(height: 10),
             SizedBox(
               height: 250,
-              child: PieChart(
-                PieChartData(
-                  sections: _getGradeData(),
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 40,
-                ),
+              child: Stack(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: PieChart(
+                          PieChartData(
+                            sections: _getGradeData(),
+                            sectionsSpace: 0,
+                            centerSpaceRadius: 40,
+                            pieTouchData: PieTouchData(
+                              touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                setState(() {
+                                  if (!event.isInterestedForInteractions ||
+                                      pieTouchResponse == null ||
+                                      pieTouchResponse.touchedSection == null ||
+                                      pieTouchResponse.touchedSection!.touchedSectionIndex < 0) {
+                                    touchedIndex = null;
+                                    return;
+                                  }
+                                  touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: _buildGradeLegend(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (touchedIndex != null)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.4,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                            ),
+                          ],
+                        ),
+                        child: _buildTouchedGradeInfo(),
+                      ),
+                    ),
+                ],
               ),
             ),
           ],
@@ -196,37 +208,117 @@ class _ProgressionPageState extends State<ProgressionPage> {
     );
   }
 
-  List<PieChartSectionData> _getGradeData() {
-    final grades = {
-      'A': int.tryParse(aController.text) ?? 0,
-      'B': int.tryParse(bController.text) ?? 0,
-      'C': int.tryParse(cController.text) ?? 0,
-      'D': int.tryParse(dController.text) ?? 0,
-      'F': int.tryParse(fController.text) ?? 0,
-    };
+  Widget _buildTouchedGradeInfo() {
+    final gradeKeys = grades.keys.toList();
+    if (touchedIndex == null || touchedIndex! >= gradeKeys.length) return const SizedBox();
 
-    return grades.entries.map((entry) {
+    final grade = gradeKeys[touchedIndex!];
+    final count = grades[grade]!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                color: _getGradeColor(grade),
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '$grade: $count',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        if (grade == 'Others')
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('C+: ${othersGrades['C+']}'),
+                Text('C: ${othersGrades['C']}'),
+                Text('C-: ${othersGrades['C-']}'),
+                Text('D: ${othersGrades['D']}'),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildGradeLegend() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: grades.keys.map((grade) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: Row(
+            children: [
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: _getGradeColor(grade),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                grade,
+                style: const TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  List<PieChartSectionData> _getGradeData() {
+    final gradeKeys = grades.keys.toList();
+
+    return gradeKeys.asMap().entries.map((entry) {
+      final index = entry.key;
+      final grade = entry.value;
+      final isTouched = index == touchedIndex && touchedIndex != null;
+      final radius = isTouched ? 45.0 : 35.0;
+
       return PieChartSectionData(
-        title: '${entry.key}: ${entry.value}',
-        value: entry.value.toDouble(),
-        color: _getGradeColor(entry.key),
-        radius: 50,
+        color: _getGradeColor(grade),
+        value: grades[grade]!.toDouble(),
+        radius: radius,
+        showTitle: false, // This ensures no text appears on the pie sections
       );
     }).toList();
   }
 
   Color _getGradeColor(String grade) {
     switch (grade) {
+      case 'A+':
+        return Colors.green[900]!;
       case 'A':
-        return Colors.green;
+        return Colors.green[700]!;
+      case 'A-':
+        return Colors.green[500]!;
+      case 'B+':
+        return Colors.blue[700]!;
       case 'B':
-        return Colors.blue;
-      case 'C':
-        return Colors.orange;
-      case 'D':
-        return Colors.red;
-      case 'F':
-        return Colors.black;
+        return Colors.blue[500]!;
+      case 'B-':
+        return Colors.blue[300]!;
+      case 'Others':
+        return Colors.orange[400]!;
       default:
         return Colors.grey;
     }
