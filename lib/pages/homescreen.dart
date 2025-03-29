@@ -44,15 +44,8 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
     });
   }
 
-  void getUserID() {
-    User? user = FirebaseAuth.instance.currentUser;
-    setState(() {
-      userid = user?.uid ?? "User Not Logged In";
-    });
-  }
-
   final List<String> _pageTitles = [
-    "My Dashboard",        // 0: Bottom nav
+    "Dashboard",        // 0: Bottom nav
     "Add Modules",        // 1: Bottom nav
     "Your Data",          // 2: Bottom nav
     "Modules",            // 3: Bottom nav
@@ -71,7 +64,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
       case 1:
         return const ModuleAddition();
       case 2:
-        return UpcomingEventsPage(uid: userid);
+        return LatestEventsPage();
       case 3:
         return const ModulesPage();
       case 4:

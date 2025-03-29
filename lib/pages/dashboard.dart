@@ -20,15 +20,6 @@ const DashboardScreen({super.key});
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'My Dashboard',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-
-                ),
-              ),
               const SizedBox(height: 20),
               _buildModulesSection(context),
                const SizedBox(height: 24),
@@ -37,7 +28,6 @@ const DashboardScreen({super.key});
               _buildTasksSection(context),
               const SizedBox(height: 24),
               _buildEventsSection(context),
-              
             ],
           ),
         ),
