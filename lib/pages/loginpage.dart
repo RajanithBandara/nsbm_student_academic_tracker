@@ -258,7 +258,7 @@ class _SigninState extends State<Signin> with TickerProviderStateMixin {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 40),
+                    padding: const EdgeInsets.only(top: 20),
                     child: Image.asset(
                       'lib/assets/EduTrack.png',
                     ),

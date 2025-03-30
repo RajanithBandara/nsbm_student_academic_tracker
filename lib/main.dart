@@ -29,6 +29,7 @@ Future<void> initializeApp() async {
   await Hive.initFlutter();
   Hive.registerAdapter(TodoAdapter());
   await Hive.openBox<Todo>('todoBox');
+  Hive.close();
 
   // Initialize Notifications
   AwesomeNotifications().initialize(
