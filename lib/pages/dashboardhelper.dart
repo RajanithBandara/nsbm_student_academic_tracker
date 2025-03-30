@@ -2,6 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+<<<<<<< HEAD
+=======
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:nsbm_student_academic_tracker/pages/eventlist.dart';
+>>>>>>> 7f68412783280a8685550ee1d9117998f0a2f0b9
 import '../models/event_model.dart';
 import '../models/userdata_model.dart';
 
@@ -17,7 +22,13 @@ class DashboardHelper {
         ),
         if (showMore)
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to the full list of events or tasks
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LatestEventsPage()),
+              );
+            },
             child: const Row(
               children: [
                 Text('More', style: TextStyle(fontSize: 14, color: Colors.blue)),
@@ -29,6 +40,7 @@ class DashboardHelper {
     );
   }
 
+<<<<<<< HEAD
   static Widget buildTasksSection(BuildContext context) {
     return Wrap(
       spacing: 12,
@@ -66,6 +78,8 @@ class DashboardHelper {
     );
   }
 
+=======
+>>>>>>> 7f68412783280a8685550ee1d9117998f0a2f0b9
   static Widget buildEventsSection(BuildContext context) {
     return FutureBuilder<List<EventModel>>(
       future: fetchLatestEvents(), // Fetch only 3 upcoming events
