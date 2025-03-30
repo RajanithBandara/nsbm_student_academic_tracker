@@ -20,8 +20,6 @@ const DashboardScreen({super.key});
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              _buildModulesSection(context),
                const SizedBox(height: 24),
               _buildProgressionSection(),
               const SizedBox(height: 24),
@@ -31,78 +29,6 @@ const DashboardScreen({super.key});
             ],
           ),
         ),
-      ),
-    );
-  }
-
-
-    Widget _buildModulesSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Modules', 'Your running modules', true),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildModuleCard(
-                'Mathematics for Programming',
-                Icons.calculate,
-                const Color(0xFF2C5F75),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildModuleCard(
-                'HCI',
-                Icons.desktop_windows,
-                const Color(0xFF2C5F75),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildModuleCard(
-                'Object Oriented Programming (OOP)',
-                Icons.code,
-                const Color(0xFF2C5F75),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-
- Widget _buildModuleCard(String title, IconData icon, Color color) {
-    return Container(
-      height: 100,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 28,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
       ),
     );
   }
@@ -119,7 +45,7 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -165,7 +91,7 @@ Widget _buildSectionHeader(String title, String subtitle, bool showMore) {
       children: [
         const Text(
           'Progression',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
         Row(
