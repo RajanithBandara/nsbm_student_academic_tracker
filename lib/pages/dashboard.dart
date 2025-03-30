@@ -14,8 +14,6 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DashboardHelper.buildUserSection(context),
-              const SizedBox(height: 16),
               DashboardHelper.buildSectionHeader(context, 'Tasks', true),
               const SizedBox(height: 16),
               DashboardHelper.buildTasksSection(context),

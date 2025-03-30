@@ -6,56 +6,6 @@ import '../models/event_model.dart';
 import '../models/userdata_model.dart';
 
 class DashboardHelper {
-   static Widget buildUserSection(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return const Center(child: Text("No user logged in"));
-
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection("student").doc(user.uid).collection("userInfo").doc("details").snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (!snapshot.hasData || snapshot.data?.data() == null) {
-          return const Center(child: Text("No data found"));
-        }
-
-        final data = snapshot.data!.data() as Map<String, dynamic>;
-        final student = UserDataModel(
-          userName: data['userName'] ?? '',
-         photoURL: data['profilePic'] ?? '',
-          courseName: data['courseName'] ?? '',
-          age: data['age'] ?? 0,
-          idNumber: data['idNumber'] ?? '',
-          email: data['email'] ?? '',
-        );
-
-        return Row(
-          children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage: student.photoURL.isNotEmpty
-                  ? NetworkImage(student.photoURL)
-                  : const AssetImage('assets/default_avatar.png'),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Welcome, ${student.userName}!", style: Theme.of(context).textTheme.headlineSmall),
-                const Text("Have a great day ahead!", style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-
-
-
-
 
   static Widget buildSectionHeader(BuildContext context, String title, bool showMore) {
     return Row(
@@ -118,7 +68,7 @@ class DashboardHelper {
 
   static Widget buildEventsSection(BuildContext context) {
     return FutureBuilder<List<EventModel>>(
-      future: fetchLatestEvents(),
+      future: fetchLatestEvents(), // Fetch only 3 upcoming events
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -190,6 +140,7 @@ class DashboardHelper {
     );
   }
 
+  /// Fetches only the 3 upcoming events from Firestore.
   static Future<List<EventModel>> fetchLatestEvents() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return [];
@@ -202,7 +153,7 @@ class DashboardHelper {
           .collection("events")
           .where("startDate", isGreaterThanOrEqualTo: now)
           .orderBy("startDate", descending: false)
-          .limit(10)
+          .limit(3) // **Limit to only 3 upcoming events**
           .get();
 
       return snapshot.docs.map((doc) {
