@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:nsbm_student_academic_tracker/pages/calenderpin.dart';
 import 'package:nsbm_student_academic_tracker/pages/datasendform.dart';
+import 'package:nsbm_student_academic_tracker/pages/eventslatest.dart';
 import 'package:nsbm_student_academic_tracker/pages/fetcheddata.dart';
 import 'package:nsbm_student_academic_tracker/pages/gpapredictionpage.dart';
 import 'package:nsbm_student_academic_tracker/pages/moduledisplay.dart';
@@ -24,6 +25,7 @@ class HomeScreenUi extends StatefulWidget {
 
 class _HomeScreenUiState extends State<HomeScreenUi> {
   String userName = "Loading...";
+  String userid = "Loading...";
   int _selectedPageIndex = 0;
 
   @override
@@ -44,7 +46,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
   }
 
   final List<String> _pageTitles = [
-    "My Dashboard",        // 0: Bottom nav
+    "Dashboard",        // 0: Bottom nav
     "Add Modules",        // 1: Bottom nav
     "Your Data",          // 2: Bottom nav
     "Modules",            // 3: Bottom nav
@@ -63,7 +65,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
       case 1:
         return const ModuleAddition();
       case 2:
-        return const FetchData();
+        return LatestEventsPage();
       case 3:
         return const ModulesPage();
       case 4:
