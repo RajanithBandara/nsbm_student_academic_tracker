@@ -1,12 +1,61 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../models/event_model.dart';
+import '../models/userdata_model.dart';
 
 class DashboardHelper {
+   static Widget buildUserSection(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const Center(child: Text("No user logged in"));
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection("student").doc(user.uid).collection("userInfo").doc("details").snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data?.data() == null) {
+          return const Center(child: Text("No data found"));
+        }
+
+        final data = snapshot.data!.data() as Map<String, dynamic>;
+        final student = UserDataModel(
+          userName: data['userName'] ?? '',
+         photoURL: data['profilePic'] ?? '',
+          courseName: data['courseName'] ?? '',
+          age: data['age'] ?? 0,
+          idNumber: data['idNumber'] ?? '',
+          email: data['email'] ?? '',
+        );
+
+        return Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundImage: student.photoURL.isNotEmpty
+                  ? NetworkImage(student.photoURL)
+                  : const AssetImage('assets/default_avatar.png'),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Welcome, ${student.userName}!", style: Theme.of(context).textTheme.headlineSmall),
+                const Text("Have a great day ahead!", style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
+
 
   static Widget buildSectionHeader(BuildContext context, String title, bool showMore) {
     return Row(
@@ -36,7 +85,7 @@ class DashboardHelper {
       runSpacing: 12,
       children: List.generate(
         4,
-            (index) => buildTaskCard(context, 'Marketing project at School'),
+        (index) => buildTaskCard(context, 'Marketing project at School'),
       ),
     );
   }
@@ -66,7 +115,6 @@ class DashboardHelper {
       ),
     );
   }
-
 
   static Widget buildEventsSection(BuildContext context) {
     return FutureBuilder<List<EventModel>>(
@@ -166,4 +214,40 @@ class DashboardHelper {
       return [];
     }
   }
+
+  static Widget buildUserDataSection(BuildContext context) {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const Center(child: Text("No user logged in"));
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection("student").doc(user.uid).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data?.data() == null) {
+          return const Center(child: Text("No data found"));
+        }
+
+        final data = snapshot.data!.data() as Map<String, dynamic>;
+        final student = UserDataModel(
+          userName: data['userName'] ?? '',
+          courseName: data['courseName'] ?? '',
+          age: data['age'] ?? 0,
+          idNumber: data['idNumber'] ?? '',
+          email: data['email'] ?? '',
+          gpa: (data['gpa'] ?? 0.0).toDouble(),
+        );
+
+        return Column(
+          children: [
+            Text(student.userName, style: Theme.of(context).textTheme.headlineMedium),
+            Text("Course: ${student.courseName}"),
+            Text("Email: ${student.email}"),
+          ],
+        );
+      },
+    );
+  }
 }
+
