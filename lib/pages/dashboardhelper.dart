@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:nsbm_student_academic_tracker/pages/eventlist.dart';
 import '../models/event_model.dart';
 
 class DashboardHelper {
@@ -16,7 +17,13 @@ class DashboardHelper {
         ),
         if (showMore)
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to the full list of events or tasks
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LatestEventsPage()),
+              );
+            },
             child: const Row(
               children: [
                 Text('More', style: TextStyle(fontSize: 14, color: Colors.blue)),
@@ -25,43 +32,6 @@ class DashboardHelper {
             ),
           ),
       ],
-    );
-  }
-
-  static Widget buildTasksSection(BuildContext context) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: List.generate(
-        4,
-            (index) => buildTaskCard(context, 'Marketing project at School'),
-      ),
-    );
-  }
-
-  static Widget buildTaskCard(BuildContext context, String title) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 2 - 24,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('10 Dec 2023', style: TextStyle(fontSize: 10, color: Colors.grey)),
-          const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-        ],
-      ),
     );
   }
 
