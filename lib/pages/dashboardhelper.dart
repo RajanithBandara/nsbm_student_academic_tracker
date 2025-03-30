@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/event_model.dart';
 
 class DashboardHelper {
-
   static Widget buildSectionHeader(BuildContext context, String title, bool showMore) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,10 +65,9 @@ class DashboardHelper {
     );
   }
 
-
   static Widget buildEventsSection(BuildContext context) {
     return FutureBuilder<List<EventModel>>(
-      future: fetchLatestEvents(),
+      future: fetchLatestEvents(), // Fetch only 3 upcoming events
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -142,6 +139,7 @@ class DashboardHelper {
     );
   }
 
+  /// Fetches only the 3 upcoming events from Firestore.
   static Future<List<EventModel>> fetchLatestEvents() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return [];
@@ -154,7 +152,7 @@ class DashboardHelper {
           .collection("events")
           .where("startDate", isGreaterThanOrEqualTo: now)
           .orderBy("startDate", descending: false)
-          .limit(10)
+          .limit(3) // **Limit to only 3 upcoming events**
           .get();
 
       return snapshot.docs.map((doc) {
