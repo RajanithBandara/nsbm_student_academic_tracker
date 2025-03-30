@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:animations/animations.dart';
 import '../models/event_model.dart';
 
 class LatestEventsPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class LatestEventsPage extends StatefulWidget {
 
 class _LatestEventsPageState extends State<LatestEventsPage> {
   late Future<List<EventModel>> _eventsFuture;
+  bool _isRefreshing = false;
 
   @override
   void initState() {
@@ -40,13 +42,10 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
           .limit(10)
           .get();
 
-      List<EventModel> events = snapshot.docs.map((doc) {
+      return snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
-        // Use your EventModel factory to convert document data.
         return EventModel.fromMap(data, doc.id);
       }).toList();
-
-      return events;
     } catch (e) {
       debugPrint("Error fetching events: $e");
       return [];
@@ -54,56 +53,370 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
   }
 
   /// Refreshes the events data.
-  void refreshData() {
+  Future<void> refreshData() async {
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    HapticFeedback.mediumImpact();
+
     setState(() {
       _eventsFuture = _fetchLatestEvents();
+      _isRefreshing = false;
     });
-    HapticFeedback.heavyImpact();
+  }
+
+
+  /// Gets a color for an event based on proximity to current date
+  Color _getEventColor(DateTime date) {
+    final daysUntil = date.difference(DateTime.now()).inDays;
+
+    if (daysUntil < 1) {
+      return Colors.red.shade400; // Today or tomorrow
+    } else if (daysUntil < 3) {
+      return Colors.orange.shade400; // This week
+    } else if (daysUntil < 7) {
+      return Colors.blue.shade400; // This week
+    } else {
+      return Colors.green.shade400; // Further away
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
       appBar: AppBar(
         title: const Text("Upcoming Events"),
+        backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _isRefreshing ? null : refreshData,
+          ),
+        ],
       ),
       body: FutureBuilder<List<EventModel>>(
         future: _eventsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 60, child: LinearProgressIndicator()),
+                  SizedBox(height: 16),
+                  Text("Loading events...", style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            );
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error loading events"));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
+                  const SizedBox(height: 16),
+                  const Text("Couldn't load your events"),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: refreshData,
+                    child: const Text("Try Again"),
+                  ),
+                ],
+              ),
+            );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No upcoming events"));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.event_busy, size: 64, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "No upcoming events",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "When you add events, they'll appear here",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
           }
 
           final events = snapshot.data!;
           return RefreshIndicator(
             onRefresh: () async {
-              refreshData();
+              await refreshData();
             },
             child: ListView.builder(
               padding: const EdgeInsets.all(16.0),
-              itemCount: events.length,
+              itemCount: events.length + 1, // +1 for the header
               itemBuilder: (context, index) {
-                final event = events[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: ListTile(
-                    title: Text(
-                      event.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("📅 ${DateFormat('EEEE, MMM d, yyyy').format(event.startDate)}"),
-                        Text("📍 ${event.location}"),
-                      ],
-                    ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                if (index == 0) {
+                  // Header section
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "You have ${events.length} upcoming event${events.length == 1 ? '' : 's'}",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  );
+                }
+
+                final event = events[index - 1];
+                final eventColor = _getEventColor(event.startDate);
+
+                return OpenContainer(
+                  transitionDuration: const Duration(milliseconds: 500),
+                  openBuilder: (context, _) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: Text(event.title),
+                        backgroundColor: eventColor.withOpacity(0.8),
+                      ),
+                      body: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Date and time section
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: eventColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today,
+                                      color: eventColor,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          DateFormat('EEEE, MMMM d, yyyy').format(event.startDate),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          DateFormat('h:mm a').format(event.startDate),
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Location section
+                              Row(
+                                children: [
+                                  Icon(Icons.location_on, color: Colors.grey.shade700),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      event.location,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey.shade800,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              // Description section
+                              const Text(
+                                "Description",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                event.description ?? "No description provided",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  height: 1.5,
+                                ),
+                              ),
+
+                              const SizedBox(height: 32),
+
+                              // Action buttons
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  closedElevation: 0,
+                  closedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: Colors.grey.shade200),
                   ),
+                  closedColor: Colors.transparent,
+                  closedBuilder: (context, openContainer) {
+                    return Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: InkWell(
+                        onTap: openContainer,
+                        borderRadius: BorderRadius.circular(16),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              // Left date indicator
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: eventColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      DateFormat('d').format(event.startDate),
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: eventColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('MMM').format(event.startDate),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: eventColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // Event details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      event.title,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.access_time,
+                                          size: 14,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          DateFormat('h:mm a').format(event.startDate),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 14,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          event.location,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                    // Preview of description
+                                    if (event.description != null && event.description!.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        event.description!,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              // Category icon
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.event,
+                                  color: eventColor,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
             ),
