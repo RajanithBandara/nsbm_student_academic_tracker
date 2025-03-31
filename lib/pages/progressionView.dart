@@ -415,7 +415,6 @@ class _ProgressionChartState extends State<ProgressionChart> {
                                         leftTitles: AxisTitles(
                                           sideTitles: SideTitles(
                                             showTitles: true,
-                                            reservedSize: 30,
                                             interval: 1,
                                             getTitlesWidget: (value, meta) {
                                               return Text(
@@ -430,7 +429,7 @@ class _ProgressionChartState extends State<ProgressionChart> {
                                         ),
                                         bottomTitles: AxisTitles(
                                           axisNameWidget: Padding(
-                                            padding: const EdgeInsets.only(top: 8.0),
+                                            padding: const EdgeInsets.only(top: 3.0),
                                             child: Text(
                                               "Semester",
                                               style: theme.textTheme.bodySmall?.copyWith(
@@ -449,10 +448,6 @@ class _ProgressionChartState extends State<ProgressionChart> {
                                                   padding: const EdgeInsets.only(top: 8),
                                                   child: Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                                    decoration: BoxDecoration(
-                                                      color: colorScheme.primary.withOpacity(0.1),
-                                                      borderRadius: BorderRadius.circular(4),
-                                                    ),
                                                     child: Text(
                                                       semesterNumber,
                                                       style: theme.textTheme.bodySmall?.copyWith(
