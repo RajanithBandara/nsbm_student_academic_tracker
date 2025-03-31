@@ -14,16 +14,10 @@ class DashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DashboardHelper.buildSectionHeader(context, 'Tasks', true),
-              const SizedBox(height: 16),
-              DashboardHelper.buildTasksSection(context),
-              const SizedBox(height: 24),
-              DashboardHelper.buildSectionHeader(context, 'Upcoming Events', true ),
+              DashboardHelper.buildUserDataSection(context,),
               const SizedBox(height: 16),
               DashboardHelper.buildEventsSection(context),
               const SizedBox(height: 24),
-              DashboardHelper.buildSectionHeader(context, 'To-Do List', true),
-              const SizedBox(height: 16),
             ],
           ),
         ),
