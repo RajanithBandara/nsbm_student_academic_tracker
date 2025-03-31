@@ -9,6 +9,7 @@ import 'package:nsbm_student_academic_tracker/pages/fetcheddata.dart';
 import 'package:nsbm_student_academic_tracker/pages/gpapredictionpage.dart';
 import 'package:nsbm_student_academic_tracker/pages/moduledisplay.dart';
 import 'package:nsbm_student_academic_tracker/pages/progressionView.dart';
+import 'package:nsbm_student_academic_tracker/pages/progressionchart.dart';
 import 'package:nsbm_student_academic_tracker/pages/settings.dart';
 import 'package:nsbm_student_academic_tracker/pages/loginpage.dart';
 import 'package:nsbm_student_academic_tracker/pages/timer.dart';
@@ -48,7 +49,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
   final List<String> _pageTitles = [
     "Dashboard",        // 0: Bottom nav
     "Add Modules",        // 1: Bottom nav
-    "Your Data",          // 2: Bottom nav
+    "To Do List",          // 2: Bottom nav
     "Modules",            // 3: Bottom nav
     "Progression",        // 4: Bottom nav
     "Enter your Data",    // 5: Drawer
@@ -65,15 +66,15 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
       case 1:
         return const ModuleAddition();
       case 2:
-        return LatestEventsPage();
+        return TodoPage();
       case 3:
         return const ModulesPage();
       case 4:
-        return const ProgressionPage();
+        return const ProgressionChart();
       case 5:
         return const DataSendForm();
       case 6:
-        return TodoPage();
+        return FetchData();
       case 7:
         return TimerPage();
       case 8:
@@ -190,7 +191,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
             label: bottomNavTitles[1],
           ),
           NavigationDestination(
-            icon: const Icon(Icons.info),
+            icon: const Icon(Icons.add_box_outlined),
             label: bottomNavTitles[2],
           ),
           NavigationDestination(

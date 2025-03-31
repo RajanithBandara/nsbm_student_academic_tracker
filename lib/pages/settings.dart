@@ -28,7 +28,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _loadUserData() async {
     if (userId == null) return;
 
-    DocumentSnapshot userDoc = await _firestore.collection('student').doc(userId).collection('credentials').doc('userinfo').get();
+    DocumentSnapshot userDoc = await _firestore.collection('student').doc(userId).collection('credentials').doc('userInfo').get();
     if (userDoc.exists) {
       Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
 
@@ -44,9 +44,8 @@ class _SettingsState extends State<Settings> {
   Future<void> _saveSettings() async {
     if (userId == null) return;
 
-    await _firestore.collection('student').doc(userId).collection('credentials').doc('userInfo').set({
-      "name": _nameController.text,
-      "notificationsEnabled": _notificationsEnabled,
+    await _firestore.collection('student').doc(userId).set({
+      "userName": _nameController.text,
     }, SetOptions(merge: true));
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -98,19 +97,6 @@ class _SettingsState extends State<Settings> {
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 20),
-            const Text(
-              "Notifications",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SwitchListTile(
-              title: const Text("Enable Notifications"),
-              value: _notificationsEnabled,
-              onChanged: (val) {
-                setState(() {
-                  _notificationsEnabled = val;
-                });
-              },
-            ),
           ],
         ),
       ),
