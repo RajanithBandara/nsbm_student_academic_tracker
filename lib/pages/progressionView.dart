@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -31,23 +35,64 @@ class ProgressionPage extends StatefulWidget {
 class _ProgressionPageState extends State<ProgressionPage> {
   String selectedYear = '1st Year';
   int? touchedIndex;
+  Map<String, int> grades = {};
+  Map<String, int> othersGrades = {};
+  bool isLoading = true;
 
-  final Map<String, int> grades = {
-    'A+': 5,
-    'A': 7,
-    'A-': 4,
-    'B+': 3,
-    'B': 4,
-    'B-': 3,
-    'Others': 10,
-  };
+  @override
+  void initState() {
+    super.initState();
+    _fetchGradeData();
+  }
 
-  final Map<String, int> othersGrades = {
-    'C+': 2,
-    'C': 3,
-    'C-': 2,
-    'D': 3,
-  };
+  Future<void> _fetchGradeData() async {
+    try {
+      // Get all modules for the student
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('credentials')
+          .doc('2003014810790') // Using the ID from your database
+          .collection('modules')
+          .get();
+
+      // Temporary map to store grades
+      final tempGrades = <String, int>{};
+      final tempOthersGrades = <String, int>{
+        'C+': 0,
+        'C': 0,
+        'C-': 0,
+        'D': 0,
+      };
+
+      // Process each module
+      for (final doc in querySnapshot.docs) {
+        final grade = doc['moduleGrade'] as String;
+        
+        // Group lower grades into "Others"
+        if (['A+', 'A', 'A-', 'B+', 'B', 'B-'].contains(grade)) {
+          tempGrades[grade] = (tempGrades[grade] ?? 0) + 1;
+        } else {
+          tempOthersGrades[grade] = (tempOthersGrades[grade] ?? 0) + 1;
+        }
+      }
+
+      // Calculate total for Others
+      final othersTotal = tempOthersGrades.values.fold(0, (sum, count) => sum + count);
+      if (othersTotal > 0) {
+        tempGrades['Others'] = othersTotal;
+      }
+
+      setState(() {
+        grades = tempGrades;
+        othersGrades = tempOthersGrades;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      debugPrint('Error fetching grade data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +161,14 @@ class _ProgressionPageState extends State<ProgressionPage> {
   }
 
   Widget _buildGradeDistributionChart() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (grades.isEmpty) {
+      return const Center(child: Text('No grade data available'));
+    }
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -211,10 +264,10 @@ class _ProgressionPageState extends State<ProgressionPage> {
   Widget _buildTouchedGradeInfo() {
     final gradeKeys = grades.keys.toList();
     if (touchedIndex == null || touchedIndex! >= gradeKeys.length) return const SizedBox();
-
+    
     final grade = gradeKeys[touchedIndex!];
     final count = grades[grade]!;
-
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -246,10 +299,10 @@ class _ProgressionPageState extends State<ProgressionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('C+: ${othersGrades['C+']}'),
-                Text('C: ${othersGrades['C']}'),
-                Text('C-: ${othersGrades['C-']}'),
-                Text('D: ${othersGrades['D']}'),
+                if (othersGrades['C+']! > 0) Text('C+: ${othersGrades['C+']}'),
+                if (othersGrades['C']! > 0) Text('C: ${othersGrades['C']}'),
+                if (othersGrades['C-']! > 0) Text('C-: ${othersGrades['C-']}'),
+                if (othersGrades['D']! > 0) Text('D: ${othersGrades['D']}'),
               ],
             ),
           ),
@@ -287,7 +340,7 @@ class _ProgressionPageState extends State<ProgressionPage> {
 
   List<PieChartSectionData> _getGradeData() {
     final gradeKeys = grades.keys.toList();
-
+    
     return gradeKeys.asMap().entries.map((entry) {
       final index = entry.key;
       final grade = entry.value;
@@ -298,7 +351,7 @@ class _ProgressionPageState extends State<ProgressionPage> {
         color: _getGradeColor(grade),
         value: grades[grade]!.toDouble(),
         radius: radius,
-        showTitle: false, // This ensures no text appears on the pie sections
+        showTitle: false,
       );
     }).toList();
   }
