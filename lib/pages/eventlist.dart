@@ -139,9 +139,9 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     "When you add events, they'll appear here",
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -165,10 +165,10 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
                     children: [
                       Text(
                         "You have ${events.length} upcoming event${events.length == 1 ? '' : 's'}",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -233,7 +233,7 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
                               // Location section
                               Row(
                                 children: [
-                                  Icon(Icons.location_on, color: Colors.grey.shade700),
+                                  Icon(Icons.location_on, color: Theme.of(context).colorScheme.secondary),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
@@ -280,14 +280,13 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
                   },
                   closedElevation: 0,
                   closedShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.grey.shade200),
+
                   ),
                   closedColor: Colors.transparent,
                   closedBuilder: (context, openContainer) {
                     return Card(
                       elevation: 0,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                       margin: const EdgeInsets.only(bottom: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -402,7 +401,7 @@ class _LatestEventsPageState extends State<LatestEventsPage> {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: Theme.of(context).colorScheme.onInverseSurface,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
