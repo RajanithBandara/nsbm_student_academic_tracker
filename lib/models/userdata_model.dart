@@ -6,6 +6,7 @@ class UserDataModel {
   final String idNumber;
   final String email;
   final double gpa;
+  final double predictedgpa;
 
   UserDataModel({
     required this.userName,
@@ -14,6 +15,7 @@ class UserDataModel {
     required this.idNumber,
     required this.email,
     this.gpa = 0.0,
+    this.predictedgpa = 0.0,
   });
 
   Map<String, dynamic> toMap() {
@@ -24,6 +26,7 @@ class UserDataModel {
       'idNumber': idNumber,
       'email': email,
       'gpa': gpa,
+      'predictedgpa': predictedgpa,
     };
   }
 }

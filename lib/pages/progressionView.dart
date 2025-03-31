@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:nsbm_student_academic_tracker/functions/gpapredictionfunction.dart';
 
 class ProgressionChart extends StatefulWidget {
   const ProgressionChart({super.key});
@@ -126,8 +127,33 @@ class _ProgressionChartState extends State<ProgressionChart> {
     }, SetOptions(merge: true));
   }
 
+  Future<void> predictGPA(
+      Future<Map<String, double>> semesterGPAFuture,
+      User? user, {
+        int totalSemesters = 8,
+      }) async {
+    if (user == null) return;
+
+    final Map<String, double> semesterGPAStringMap = await semesterGPAFuture;
+
+    final Map<int, double> semesterGPA = {};
+    semesterGPAStringMap.forEach((key, value) {
+      final int? sem = int.tryParse(key);
+      if (sem != null) {
+        semesterGPA[sem] = value;
+      }
+    });
+
+    final predictedGPA = GpaPredictionSystem.predictFinalGPA(semesterGPA, totalSemesters);
+
+    await FirebaseFirestore.instance.collection("student").doc(user.uid).set({
+      'predictedgpa': predictedGPA,
+    }, SetOptions(merge: true));
+  }
+
   @override
   Widget build(BuildContext context) {
+    predictGPA(_semesterGPA, user);
     gpastore();
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -425,6 +451,7 @@ class _ProgressionChartState extends State<ProgressionChart> {
                                         leftTitles: AxisTitles(
                                           sideTitles: SideTitles(
                                             showTitles: true,
+                                            reservedSize: 30,
                                             interval: 1,
                                             getTitlesWidget: (value, meta) {
                                               return Text(

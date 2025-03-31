@@ -383,6 +383,7 @@ class DashboardHelper {
           idNumber: data['idNumber'] ?? '',
           email: data['email'] ?? '',
           gpa: (data['gpa'] ?? 0.0).toDouble(),
+          predictedgpa: (data['predictedgpa'] ?? 0.0).toDouble(),
         );
 
         const primaryColor = Color(0xFF2541B2); // Assuming this is the color based on gradient
@@ -588,9 +589,39 @@ class DashboardHelper {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ],
+                  ]
                 ),
               ),
+              Container(
+                margin: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white10,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      size: 18,
+                      color: Colors.white70,
+                    ),
+                    Text("Predicted GPA : ", style: TextStyle(color: Colors.white70)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        student.predictedgpa > 0
+                            ? student.predictedgpa.toStringAsFixed(2)
+                            : "N/A",
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         );
