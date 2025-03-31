@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,31 +13,41 @@ class _SettingsState extends State<Settings> {
   final TextEditingController _nameController = TextEditingController();
   bool _notificationsEnabled = true;
   ImageProvider? _profileImage;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String? _photoURL;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    _nameController.text = user?.displayName ?? "Your Name";
-    if (user?.photoURL != null) {
-      _profileImage = NetworkImage(user!.photoURL!);
-    } else {
-      _profileImage = const AssetImage('assets/profile_placeholder.png');
+    userId = _auth.currentUser?.uid;
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    if (userId == null) return;
+
+    DocumentSnapshot userDoc = await _firestore.collection('student').doc(userId).collection('credentials').doc('userInfo').get();
+    if (userDoc.exists) {
+      Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+
+      setState(() {
+        _nameController.text = userData?["name"] ?? "Your Name";
+        _notificationsEnabled = userData?["notificationsEnabled"] ?? true;
+        _photoURL = userData?["photoURL"];
+        _profileImage = _photoURL != null ? NetworkImage(_photoURL!) : const AssetImage('assets/profile_placeholder.png');
+      });
     }
   }
 
-  // Simulate picking a new profile picture.
-  Future<void> _pickProfilePicture() async {
-
-    setState(() {
-      _profileImage = const AssetImage('assets/new_profile.png');
-    });
-  }
-
   Future<void> _saveSettings() async {
-    // Here you would save the settings to your backend or local storage.
-    debugPrint(
-        "Saving settings: Name: ${_nameController.text}, Notifications: $_notificationsEnabled");
+    if (userId == null) return;
+
+    await _firestore.collection('student').doc(userId).set({
+      "userName": _nameController.text,
+    }, SetOptions(merge: true));
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Settings saved")),
     );
@@ -86,22 +97,15 @@ class _SettingsState extends State<Settings> {
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 20),
-            const Text(
-              "Notifications",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SwitchListTile(
-              title: const Text("Enable Notifications"),
-              value: _notificationsEnabled,
-              onChanged: (val) {
-                setState(() {
-                  _notificationsEnabled = val;
-                });
-              },
-            ),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _pickProfilePicture() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile picture update feature coming soon!")),
     );
   }
 
