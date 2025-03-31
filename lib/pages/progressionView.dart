@@ -97,7 +97,7 @@ class _ProgressionChartState extends State<ProgressionChart> {
   }
 
   String _getGradeFromGPA(double gpa) {
-    if (gpa >= 4.0) return "A";
+    if (gpa >= 3.8) return "A";
     if (gpa >= 3.7) return "A-";
     if (gpa >= 3.3) return "B+";
     if (gpa >= 3.0) return "B";
