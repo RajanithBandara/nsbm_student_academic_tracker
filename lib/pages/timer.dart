@@ -303,22 +303,16 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
         : 0.0;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text("Countdown Timer"),
-        centerTitle: true,
-      ),
+      backgroundColor: Theme.of(context).colorScheme.onInverseSurface,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).colorScheme.background,
-              Theme.of(context).colorScheme.background.withOpacity(0.8),
-              Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+              Theme.of(context).colorScheme.onInverseSurface,
+              Theme.of(context).colorScheme.onInverseSurface,
+              Theme.of(context).colorScheme.onInverseSurface,
             ],
           ),
         ),
@@ -434,7 +428,6 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
                     const SizedBox(height: 50),
                     // Timer controls
                     Card(
-                      elevation: 4,
                       child: Padding(
                         padding: const EdgeInsets.all(0.0),
                         child: Column(
