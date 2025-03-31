@@ -425,6 +425,7 @@ class _ProgressionChartState extends State<ProgressionChart> {
                                         leftTitles: AxisTitles(
                                           sideTitles: SideTitles(
                                             showTitles: true,
+                                            reservedSize: 30,
                                             interval: 1,
                                             getTitlesWidget: (value, meta) {
                                               return Text(
