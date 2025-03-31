@@ -50,7 +50,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
     "Modules",            // 3: Bottom nav
     "Progression",        // 4: Bottom nav
     "Enter your Data",    // 5: Drawer
-    "To Do List",       // 6: Drawer
+    "About you",       // 6: Drawer
     "Timer",
     "Calender",
     "Settings"         // 7: Drawer
@@ -136,8 +136,8 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
             label: Text("Enter your Data"),
           ),
           const NavigationDrawerDestination(
-            icon: Icon(Icons.list),
-            label: Text("To Do List"),
+            icon: Icon(Icons.info),
+            label: Text("About you"),
           ),
           const NavigationDrawerDestination(
               icon: Icon(Icons.timer),
