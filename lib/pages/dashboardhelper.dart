@@ -2,13 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../pages/eventlist.dart';
 import '../models/event_model.dart';
 import '../models/userdata_model.dart';
 
 class DashboardHelper {
-  // Color palette
   static const Color primaryColor = Color(0xFF4361EE);
   static const Color secondaryColor = Color(0xFFFD3E81);
   static const Color accentColor = Color(0xFF05C3DD);
@@ -17,7 +15,6 @@ class DashboardHelper {
   static const Color textPrimaryColor = Color(0xFF2E3A59);
   static const Color textSecondaryColor = Color(0xFF8D9AAF);
 
-  /// Builds a section header with optional "More" button
   static Widget buildSectionHeader(BuildContext context, String title, bool showMore, {VoidCallback? onMoreTap, Widget? icon}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -67,7 +64,7 @@ class DashboardHelper {
       ),
     );
   }
-  /// Builds events section with a vertical list of upcoming events
+
   static Widget buildEventsSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +145,6 @@ class DashboardHelper {
     );
   }
 
-  /// Builds a single event card with improved design
   static Widget buildEventCard(EventModel event) {
     Color eventColor = _getEventColor(event.startDate);
 
@@ -300,7 +296,6 @@ class DashboardHelper {
     );
   }
 
-  /// Gets a color for an event based on proximity to current date
   static Color _getEventColor(DateTime date) {
     final daysUntil = date.difference(DateTime.now()).inDays;
 
@@ -315,7 +310,6 @@ class DashboardHelper {
     }
   }
 
-  /// Fetches only the 3 upcoming events from Firestore.
   static Future<List<EventModel>> fetchLatestEvents() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) return [];
@@ -341,7 +335,6 @@ class DashboardHelper {
     }
   }
 
-  /// Builds the user profile card with academic info
   static Widget buildUserDataSection(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -399,7 +392,6 @@ class DashboardHelper {
           gpa: (data['gpa'] ?? 0.0).toDouble(),
         );
 
-        // Define primaryColor if not defined elsewhere
         const primaryColor = Color(0xFF2541B2); // Assuming this is the color based on gradient
 
         return Container(
@@ -613,7 +605,6 @@ class DashboardHelper {
     );
   }
 
-// Added missing helper function
   static Widget _buildDefaultAvatar(String userName) {
     String initials = '';
     if (userName.isNotEmpty) {
@@ -637,7 +628,7 @@ class DashboardHelper {
       ),
     );
   }
-  /// Builds a quick stats section for the dashboard
+
   static Widget buildStatsSection(BuildContext context) {
     // Sample stats
     final stats = [
@@ -708,7 +699,6 @@ class DashboardHelper {
     );
   }
 
-  /// Build a complete dashboard with all sections
   static Widget buildDashboard(BuildContext context) {
     return Container(
       color: backgroundColor,

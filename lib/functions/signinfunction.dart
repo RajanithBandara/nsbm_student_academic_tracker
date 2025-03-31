@@ -8,7 +8,7 @@ class AuthService {
     try {
       await FirebaseAuth.instance.signOut();
     } catch (e) {
-      print("Error signing out: $e");
+      debugPrint("Error signing out: $e");
     }
   }
 
@@ -20,11 +20,7 @@ class AuthService {
       final user = userCredential.user;
 
       if (user != null && user.emailVerified) {
-        await FirebaseFirestore.instance.collection('student').doc(user.uid).collection('credentials').doc('userInfo').set({
-          'email': user.email,
-          'lastLogin': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-
+        await checkAndUpdateUserName(user);
         return userCredential;
       } else {
         await FirebaseAuth.instance.signOut();
@@ -67,12 +63,7 @@ class AuthService {
       final user = userCredential.user;
 
       if (user != null) {
-        await FirebaseFirestore.instance.collection('student').doc(user.uid).collection('credentials').doc('userInfo').set({
-          'displayName': user.displayName,
-          'email': user.email,
-          'photoURL': user.photoURL,
-          'lastLogin': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+        await checkAndUpdateUserName(user);
       }
 
       return userCredential;
@@ -87,6 +78,31 @@ class AuthService {
     }
   }
 
+  static Future<void> checkAndUpdateUserName(User user) async {
+    try {
+      final userRef = FirebaseFirestore.instance.collection('student').doc(user.uid);
+      final userDoc = await userRef.get();
+
+      if (!userDoc.exists || !userDoc.data()!.containsKey('userName') || userDoc.data()!['userName'] == null) {
+        await userRef.set({
+          'userName': user.displayName ?? 'Unknown',
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+
+      // Always update credentials
+      await userRef.collection('credentials').doc('userInfo').set({
+        'displayName': user.displayName,
+        'email': user.email,
+        'photoURL': user.photoURL,
+        'lastLogin': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint("Error updating userName: $e");
+    }
+  }
+
+  /// Handles Firebase authentication errors
   static void _handleAuthError(BuildContext context, FirebaseAuthException e) {
     String message;
     switch (e.code) {

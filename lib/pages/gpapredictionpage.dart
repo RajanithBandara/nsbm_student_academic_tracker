@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import '../models/module_model.dart';
 import '../functions/gpapredictionfunction.dart';
-import './gpapredict_card.dart'; // Import the new widget
+import './gpapredict_card.dart';
 
 class GpaPredictionPage extends StatefulWidget {
   final int totalSemesters;

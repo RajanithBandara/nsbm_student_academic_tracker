@@ -22,7 +22,6 @@ class _DataSendFormState extends State<DataSendForm> {
 
   Future<void> storeData() async {
     try {
-      // Debug: Check email value before submission
       debugPrint("Email Entered: ${_emailController.text}");
 
       final userData = UserDataModel(
