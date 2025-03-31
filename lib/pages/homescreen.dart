@@ -154,7 +154,7 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
         ],
       ),
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 150),
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(
             opacity: animation,
@@ -198,37 +198,6 @@ class _HomeScreenUiState extends State<HomeScreenUi> {
           NavigationDestination(
             icon: const Icon(Icons.ssid_chart),
             label: bottomNavTitles[4],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class WelcomeHome extends StatelessWidget {
-  final String userName;
-  const WelcomeHome({super.key, required this.userName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.account_circle,
-            size: 100,
-            color: Theme.of(context).iconTheme.color,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Welcome!",
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            userName,
-            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ],
       ),

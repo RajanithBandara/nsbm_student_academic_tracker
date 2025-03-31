@@ -81,110 +81,267 @@ class _ModulesPageState extends State<ModulesPage> {
       case 'A+':
       case 'A':
       case 'A-':
+        return Colors.green.shade700;
       case 'B+':
       case 'B':
       case 'B-':
-        return Colors.green;
+        return Colors.green.shade400;
       case 'C+':
       case 'C':
       case 'C-':
-        return Colors.amber;
+        return Colors.amber.shade600;
       case 'D+':
       case 'D':
+        return Colors.deepOrange;
       case 'F':
-        return Colors.red;
+        return Colors.red.shade700;
       default:
-        return Colors.grey;
+        return Colors.blueGrey;
     }
   }
 
   Widget _buildSummaryCard(BuildContext context, List<ModuleModel> allModules) {
     final totalCredits =
     allModules.fold<int>(0, (sum, mod) => sum + mod.moduleCredit);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.all(16.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+      elevation: 3,
+      margin: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              colorScheme.primaryContainer,
+              colorScheme.primaryContainer.withOpacity(0.7),
+            ],
+          ),
+        ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Total Modules: ${allModules.length}",
-                style: Theme.of(context).textTheme.bodyLarge),
-            Text("Total Credits: $totalCredits",
-                style: Theme.of(context).textTheme.bodyLarge),
+            Text(
+              "Academic Progress",
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onPrimaryContainer,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _summaryItem(
+                  context,
+                  'Modules',
+                  allModules.length.toString(),
+                  Icons.book,
+                  colorScheme,
+                ),
+                Container(
+                  height: 40,
+                  width: 1,
+                  color: colorScheme.onPrimaryContainer.withOpacity(0.2),
+                ),
+                _summaryItem(
+                  context,
+                  'Credits',
+                  totalCredits.toString(),
+                  Icons.stars,
+                  colorScheme,
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
+  Widget _summaryItem(BuildContext context, String label, String value,
+      IconData icon, ColorScheme colorScheme) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          color: colorScheme.primary,
+          size: 28,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onPrimaryContainer,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onPrimaryContainer.withOpacity(0.8),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildModuleTile(BuildContext context, ModuleModel module, int index) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final gradeColor = _gradeColor(module.moduleGrade);
 
     return AnimationConfiguration.staggeredList(
       position: index,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 400),
       child: SlideAnimation(
-        verticalOffset: 50.0,
+        verticalOffset: 40.0,
         child: FadeInAnimation(
           child: Card(
             elevation: 2,
             color: colorScheme.surface,
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-            child: ListTile(
-              contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              title: Text(
-                module.moduleName,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(
+                color: colorScheme.outlineVariant.withOpacity(0.2),
+                width: 1,
               ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Code: ${module.moduleCode}",
-                        style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant)),
-                    const SizedBox(height: 2),
-                    Row(
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Grade indicator
+                  Container(
+                    width: 50,
+                    height: 50,
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      color: gradeColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        module.moduleGrade,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: gradeColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Module details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Grade: "),
-                        Chip(
-                          label: Text(module.moduleGrade),
-                          backgroundColor: _gradeColor(module.moduleGrade)
-                              .withOpacity(0.2),
-                          labelStyle: textTheme.bodyMedium?.copyWith(
-                            color: _gradeColor(module.moduleGrade),
+                        Text(
+                          module.moduleName,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
                           ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                module.moduleCode,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSecondaryContainer,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.credit_card,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${module.moduleCredit} Credits",
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    Text("Credits: ${module.moduleCredit}",
-                        style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant)),
-                  ],
-                ),
-              ),
-              trailing: IconButton(
-                icon: Icon(Icons.delete, color: colorScheme.error),
-                onPressed: () {
-                  deleteModule(module.moduleId);
-                },
+                  ),
+                  // Delete button
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => deleteModule(module.moduleId),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.errorContainer.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.delete_outline,
+                        size: 20,
+                        color: colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSemesterHeader(BuildContext context, int semester) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: colorScheme.tertiary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'Semester $semester',
+              style: textTheme.titleMedium?.copyWith(
+                color: colorScheme.tertiary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Divider(
+              color: colorScheme.outlineVariant,
+              thickness: 1,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -199,11 +356,56 @@ class _ModulesPageState extends State<ModulesPage> {
         future: futureModules,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: LinearProgressIndicator());
+            return Center(
+              child: SizedBox(
+                width: 200,
+                child: LinearProgressIndicator(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            );
           } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Error loading modules",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
+                    "${snapshot.error}",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No modules found."));
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.school_outlined,
+                    size: 64,
+                    color: colorScheme.primary.withOpacity(0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "No modules found",
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onBackground.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
           final Map<int, List<ModuleModel>> groupedModules = snapshot.data!;
@@ -211,42 +413,20 @@ class _ModulesPageState extends State<ModulesPage> {
 
           return AnimationLimiter(
             child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               children: [
                 _buildSummaryCard(context, allModules),
-                ...groupedModules.entries.map((entry) {
-                  return AnimationConfiguration.staggeredList(
-                    position: entry.key,
-                    duration: const Duration(milliseconds: 500),
-                    child: SlideAnimation(
-                      verticalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: Card(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8.0),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.transparent),
-                            child: ExpansionTile(
-                              title: Text(
-                                'Semester ${entry.key}',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              children: entry.value
-                                  .asMap()
-                                  .entries
-                                  .map((e) =>
-                                  _buildModuleTile(context, e.value, e.key))
-                                  .toList(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                ...groupedModules.entries.expand((entry) {
+                  return [
+                    _buildSemesterHeader(context, entry.key),
+                    ...entry.value
+                        .asMap()
+                        .entries
+                        .map((e) => _buildModuleTile(context, e.value, e.key))
+                        .toList(),
+                  ];
                 }).toList(),
+                const SizedBox(height: 24), // Bottom padding
               ],
             ),
           );
