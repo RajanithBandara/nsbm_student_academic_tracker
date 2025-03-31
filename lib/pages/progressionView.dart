@@ -117,8 +117,18 @@ class _ProgressionChartState extends State<ProgressionChart> {
     return Colors.red;
   }
 
+  Future<void> gpastore() async {
+    await FirebaseFirestore.instance
+        .collection("student")
+        .doc(user!.uid)
+        .set({
+      'gpa': (await _semesterGPA).values.reduce((a, b) => a + b) / (await _semesterGPA).length,
+    }, SetOptions(merge: true));
+  }
+
   @override
   Widget build(BuildContext context) {
+    gpastore();
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

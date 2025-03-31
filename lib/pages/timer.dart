@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:workmanager/workmanager.dart';
 
 class TimerPage extends StatefulWidget {
   const TimerPage({super.key});
 
   @override
-  _TimerPageState createState() => _TimerPageState();
+  State<TimerPage> createState() => _TimerPageState();
 }
 
-class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMixin {
+class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
   TimeOfDay? targetTime;
   Duration remainingTime = Duration.zero;
   Timer? _timer;
@@ -44,7 +45,6 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
           defaultColor: Colors.blue,
           ledColor: Colors.blue,
           importance: NotificationImportance.High,
-          vibrationPattern: highVibrationPattern,
           soundSource: 'resource://raw/res_notification_sound',
         ),
         NotificationChannel(
@@ -54,7 +54,6 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
           defaultColor: Colors.green,
           ledColor: Colors.green,
           importance: NotificationImportance.Max,
-          vibrationPattern: highVibrationPattern,
           soundSource: 'resource://raw/res_custom_notification_sound',
         ),
       ],
@@ -150,17 +149,18 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
 
     _updateProgressNotification();
 
+    // Calculate delay until 5 minutes remain.
+    final delay = remainingTime - const Duration(minutes: 5);
+    if (delay > Duration.zero) {
+      _scheduleWarningTask(delay);
+    }
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (remainingTime.inSeconds > 0) {
         setState(() {
           remainingTime -= const Duration(seconds: 1);
         });
         _updateProgressNotification();
-
-        // Send warning notification when 5 minutes remaining
-        if (remainingTime.inMinutes == 5 && remainingTime.inSeconds % 60 == 0) {
-          _sendWarningNotification();
-        }
       } else {
         timer.cancel();
         setState(() {
@@ -178,6 +178,7 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
       isRunning = false;
     });
     _updateProgressNotification(paused: true);
+    Workmanager().cancelByUniqueName("warningTask");
   }
 
   void _resetTimer() {
@@ -189,6 +190,7 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
       _totalTimeSeconds = null;
     });
     AwesomeNotifications().cancel(2);
+    Workmanager().cancelByUniqueName("warningTask");
   }
 
   void _updateProgressNotification({bool paused = false}) {
@@ -235,6 +237,16 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
           isDangerousOption: true,
         ),
       ],
+    );
+  }
+
+  // Schedules a background task via WorkManager to send a warning notification.
+  void _scheduleWarningTask(Duration delay) {
+    Workmanager().registerOneOffTask(
+      "warningTask", // Unique task name
+      "sendWarningNotification", // Task identifier; must be handled in callbackDispatcher
+      initialDelay: delay,
+      tag: "warningTask",
     );
   }
 
@@ -289,11 +301,7 @@ class _TimerPageState extends State<TimerPage> with SingleTickerProviderStateMix
 
   String _getTimerDescription() {
     if (targetTime == null) return "Set a countdown timer";
-
-    final now = TimeOfDay.now();
-    final target = targetTime!;
-
-    return "Counting down to ${target.format(context)}";
+    return "Counting down to ${targetTime!.format(context)}";
   }
 
   @override
