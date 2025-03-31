@@ -7,13 +7,6 @@ import '../models/event_model.dart';
 import '../models/userdata_model.dart';
 
 class DashboardHelper {
-  static const Color primaryColor = Color(0xFF4361EE);
-  static const Color secondaryColor = Color(0xFFFD3E81);
-  static const Color accentColor = Color(0xFF05C3DD);
-  static const Color backgroundColor = Color(0xFFF9FBFF);
-  static const Color cardColor = Colors.white;
-  static const Color textPrimaryColor = Color(0xFF2E3A59);
-  static const Color textSecondaryColor = Color(0xFF8D9AAF);
 
   static Widget buildSectionHeader(BuildContext context, String title, bool showMore, {VoidCallback? onMoreTap, Widget? icon}) {
     return Padding(
@@ -29,10 +22,10 @@ class DashboardHelper {
               ],
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: textPrimaryColor,
+                  color: Theme.of(context).colorScheme.inverseSurface,
                 ),
               ),
             ],
@@ -46,7 +39,7 @@ class DashboardHelper {
                 );
               },
               style: TextButton.styleFrom(
-                foregroundColor: primaryColor,
+                foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -73,7 +66,7 @@ class DashboardHelper {
           context,
           'Upcoming Events',
           true,
-          icon: const Icon(Icons.event, color: secondaryColor, size: 20),
+          icon: Icon(Icons.event, color: Theme.of(context).colorScheme.primary, size: 20),
         ),
 
         FutureBuilder<List<EventModel>>(
@@ -136,7 +129,7 @@ class DashboardHelper {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: events.length,
               itemBuilder: (context, index) {
-                return buildEventCard(events[index]);
+                return buildEventCard(events[index], context );
               },
             );
           },
@@ -145,13 +138,13 @@ class DashboardHelper {
     );
   }
 
-  static Widget buildEventCard(EventModel event) {
-    Color eventColor = _getEventColor(event.startDate);
+  static Widget buildEventCard(EventModel event, BuildContext context) {
+    Color eventColor = _getEventColor(event.startDate, context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: cardColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -211,10 +204,10 @@ class DashboardHelper {
                   children: [
                     Text(
                       event.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: textPrimaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -222,17 +215,17 @@ class DashboardHelper {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.access_time_rounded,
                           size: 14,
-                          color: textSecondaryColor,
+                          color: Theme.of(context).colorScheme.inverseSurface,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           DateFormat('h:mm a').format(event.startDate),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: textSecondaryColor,
+                            color: Theme.of(context).colorScheme.inverseSurface,
                           ),
                         ),
                       ],
@@ -240,18 +233,18 @@ class DashboardHelper {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.location_on_outlined,
                           size: 14,
-                          color: textSecondaryColor,
+                          color: Theme.of(context).colorScheme.inverseSurface,
                         ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             event.location,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: textSecondaryColor,
+                              color: Theme.of(context).colorScheme.inverseSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -263,9 +256,9 @@ class DashboardHelper {
                       const SizedBox(height: 4),
                       Text(
                         event.description!,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: textSecondaryColor,
+                          color: Theme.of(context).colorScheme.inverseSurface,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -296,7 +289,7 @@ class DashboardHelper {
     );
   }
 
-  static Color _getEventColor(DateTime date) {
+  static Color _getEventColor(DateTime date, BuildContext context) {
     final daysUntil = date.difference(DateTime.now()).inDays;
 
     if (daysUntil < 1) {
@@ -306,7 +299,7 @@ class DashboardHelper {
     } else if (daysUntil < 7) {
       return Colors.blue.shade400; // This week
     } else {
-      return secondaryColor; // Further away
+      return Theme.of(context).colorScheme.inverseSurface; // Further away
     }
   }
 
@@ -632,9 +625,9 @@ class DashboardHelper {
   static Widget buildStatsSection(BuildContext context) {
     // Sample stats
     final stats = [
-      {'icon': Icons.calendar_today, 'title': 'Classes', 'value': '12', 'color': primaryColor},
-      {'icon': Icons.assignment_turned_in, 'title': 'Assignments', 'value': '5', 'color': secondaryColor},
-      {'icon': Icons.book, 'title': 'Courses', 'value': '4', 'color': accentColor},
+      {'icon': Icons.calendar_today, 'title': 'Classes', 'value': '12', 'color': Theme.of(context).colorScheme.onInverseSurface},
+      {'icon': Icons.assignment_turned_in, 'title': 'Assignments', 'value': '5', 'color': Theme.of(context).colorScheme.secondary},
+      {'icon': Icons.book, 'title': 'Courses', 'value': '4', 'color': Theme.of(context).colorScheme.onInverseSurface},
       {'icon': Icons.trending_up, 'title': 'Attendance', 'value': '92%', 'color': Colors.green},
     ];
 
@@ -647,7 +640,7 @@ class DashboardHelper {
               margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
               decoration: BoxDecoration(
-                color: cardColor,
+                color: Theme.of(context).colorScheme.onInverseSurface,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -684,9 +677,9 @@ class DashboardHelper {
                   const SizedBox(height: 4),
                   Text(
                     stat['title'] as String,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: textSecondaryColor,
+                      color: Theme.of(context).colorScheme.inverseSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -701,7 +694,6 @@ class DashboardHelper {
 
   static Widget buildDashboard(BuildContext context) {
     return Container(
-      color: backgroundColor,
       child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
