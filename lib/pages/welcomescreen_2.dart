@@ -285,7 +285,7 @@ class _WelcomeDetailsScreenState extends State<WelcomeDetailsScreen> with Ticker
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward_rounded),
+                            Icon(Icons.arrow_forward_rounded, color: Theme.of(context).colorScheme.surface,),
                           ],
                         ),
                       ),
